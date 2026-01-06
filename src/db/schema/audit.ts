@@ -24,7 +24,7 @@ export const auditLogs = pgTable(
             .notNull()
             .references(() => organizations.id, { onDelete: 'cascade' }),
 
-        // Acteur (peut être null pour tentatives échouées)
+        // Actor (can be null for failed attempts)
         identityId: uuid('identity_id').references(() => identities.id, {
             onDelete: 'set null',
         }),
@@ -35,25 +35,25 @@ export const auditLogs = pgTable(
             onDelete: 'set null',
         }),
 
-        // Événement
+        // Event
         eventType: varchar('event_type', { length: 127 }).notNull(), // "auth.login.success"
         eventCategory: eventCategoryEnum('event_category').notNull(),
         severity: eventSeverityEnum('severity').notNull(),
 
-        // Contexte client
+        // Client context
         ipAddress: inet('ip_address'),
         userAgent: text('user_agent'),
 
-        // Ressource affectée
+        // Affected resource
         resourceType: varchar('resource_type', { length: 63 }),
         resourceId: uuid('resource_id'),
 
-        // Résultat
+        // Result
         success: boolean('success').notNull(),
         errorMessage: text('error_message'),
         errorCode: varchar('error_code', { length: 63 }),
 
-        // Metadata extensible
+        // Extensible metadata
         metadata: jsonb('metadata')
             .$type<Record<string, unknown>>()
             .default({})
@@ -65,18 +65,18 @@ export const auditLogs = pgTable(
             .defaultNow(),
     },
     (table) => [
-        // Timeline par organisation (requête la plus fréquente)
+        // Timeline by organization (most frequent query)
         index('audit_log_org_created_idx').on(
             table.organizationId,
             table.createdAt.desc()
         ),
 
-        // Timeline par identité
+        // Timeline by identity
         index('audit_log_identity_created_idx')
             .on(table.identityId, table.createdAt.desc())
             .where(sql`${table.identityId} IS NOT NULL`),
 
-        // Filtrage par catégorie et sévérité
+        // Filtering by category and severity
         index('audit_log_category_severity_idx').on(
             table.organizationId,
             table.eventCategory,
@@ -84,26 +84,26 @@ export const auditLogs = pgTable(
             table.createdAt.desc()
         ),
 
-        // Recherche par type d'événement
+        // Search by event type
         index('audit_log_event_type_idx').on(
             table.organizationId,
             table.eventType,
             table.createdAt.desc()
         ),
 
-        // Index pour les incidents de sécurité
+        // Index for security incidents
         index('audit_log_security_critical_idx')
             .on(table.organizationId, table.createdAt.desc())
             .where(
                 sql`${table.eventCategory} = 'security' OR ${table.severity} = 'critical'`
             ),
 
-        // Index sur IP pour investigation
+        // Index on IP for investigation
         index('audit_log_ip_idx')
             .on(table.ipAddress, table.createdAt.desc())
             .where(sql`${table.ipAddress} IS NOT NULL`),
 
-        // Contrainte: eventType format
+        // Constraint: eventType format
         check(
             'audit_log_event_type_format',
             sql`${table.eventType} ~ '^[a-z]+\\.[a-z]+\\.[a-z]+$'`

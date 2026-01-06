@@ -15,7 +15,7 @@ import { identities } from './identities';
 import { organizations } from './organizations';
 
 // ============================================================================
-// PERMISSIONS (Système granulaire namespace:resource:action)
+// PERMISSIONS (Granular system namespace:resource:action)
 // ============================================================================
 
 export const permissions = pgTable(
@@ -26,15 +26,15 @@ export const permissions = pgTable(
             .notNull()
             .references(() => organizations.id, { onDelete: 'cascade' }),
 
-        // Clé composite: "users:profiles:read" ou "users:*:read" ou "*:*:*"
+        // Composite key: "users:profiles:read" or "users:*:read" or "*:*:*"
         key: varchar('key', { length: 255 }).notNull(),
 
-        // Composants de la clé (dénormalisés pour les requêtes)
+        // Key components (denormalized for queries)
         namespace: varchar('namespace', { length: 63 }).notNull(),
         resource: varchar('resource', { length: 63 }).notNull(),
         action: varchar('action', { length: 63 }).notNull(),
 
-        // Informations
+        // Information
         name: varchar('name', { length: 255 }).notNull(),
         description: text('description'),
 
@@ -48,12 +48,12 @@ export const permissions = pgTable(
         deletedAt: timestamp('deleted_at', { withTimezone: true }),
     },
     (table) => [
-        // Clé unique par organisation
+        // Unique key per organization
         uniqueIndex('permission_org_key_unique_idx')
             .on(table.organizationId, table.key)
             .where(sql`${table.deletedAt} IS NULL`),
 
-        // Recherche par composants (pour matching wildcard)
+        // Search by components (for wildcard matching)
         index('permission_org_components_idx')
             .on(
                 table.organizationId,
@@ -68,13 +68,13 @@ export const permissions = pgTable(
             .on(table.deletedAt)
             .where(sql`${table.deletedAt} IS NOT NULL`),
 
-        // Contrainte: key = namespace:resource:action
+        // Constraint: key = namespace:resource:action
         check(
             'permission_key_format',
             sql`${table.key} = ${table.namespace} || ':' || ${table.resource} || ':' || ${table.action}`
         ),
 
-        // Contrainte: caractères valides
+        // Constraint: valid characters
         check(
             'permission_components_format',
             sql`${table.namespace} ~ '^[a-z0-9_*]+$' AND ${table.resource} ~ '^[a-z0-9_*]+$' AND ${table.action} ~ '^[a-z0-9_*]+$'`
@@ -83,7 +83,7 @@ export const permissions = pgTable(
 );
 
 // ============================================================================
-// RÔLES (Groupes de permissions)
+// ROLES (Permission groups)
 // ============================================================================
 
 export const roles = pgTable(
@@ -94,12 +94,12 @@ export const roles = pgTable(
             .notNull()
             .references(() => organizations.id, { onDelete: 'cascade' }),
 
-        // Identifiants
+        // Identifiers
         slug: varchar('slug', { length: 63 }).notNull(),
         name: varchar('name', { length: 255 }).notNull(),
         description: text('description'),
 
-        // Système
+        // System
         isSystem: boolean('is_system').notNull().default(false),
 
         // Timestamps
@@ -112,7 +112,7 @@ export const roles = pgTable(
         deletedAt: timestamp('deleted_at', { withTimezone: true }),
     },
     (table) => [
-        // Slug unique par organisation
+        // Unique slug per organization
         uniqueIndex('role_org_slug_unique_idx')
             .on(table.organizationId, table.slug)
             .where(sql`${table.deletedAt} IS NULL`),
@@ -122,7 +122,7 @@ export const roles = pgTable(
             .on(table.deletedAt)
             .where(sql`${table.deletedAt} IS NOT NULL`),
 
-        // Contrainte: format slug
+        // Constraint: slug format
         check(
             'role_slug_format',
             sql`${table.slug} ~ '^[a-z0-9]([a-z0-9_-]*[a-z0-9])?$'`
@@ -131,7 +131,7 @@ export const roles = pgTable(
 );
 
 // ============================================================================
-// ROLE_PERMISSIONS (Table de jonction)
+// ROLE_PERMISSIONS (Junction table)
 // ============================================================================
 
 export const rolePermissions = pgTable(
@@ -149,19 +149,19 @@ export const rolePermissions = pgTable(
             .defaultNow(),
     },
     (table) => [
-        // Contrainte d'unicité
+        // Uniqueness constraint
         uniqueIndex('role_permission_unique_idx').on(
             table.roleId,
             table.permissionId
         ),
 
-        // Index pour lookup inverse (permissions → rôles)
+        // Index for reverse lookup (permissions → roles)
         index('role_permission_perm_idx').on(table.permissionId),
     ]
 );
 
 // ============================================================================
-// IDENTITY_ROLES (Rôles assignés aux identités)
+// IDENTITY_ROLES (Roles assigned to identities)
 // ============================================================================
 
 export const identityRoles = pgTable(
@@ -175,7 +175,7 @@ export const identityRoles = pgTable(
             .notNull()
             .references(() => roles.id, { onDelete: 'cascade' }),
 
-        // Traçabilité
+        // Traceability
         grantedBy: uuid('granted_by').references(() => identities.id, {
             onDelete: 'set null',
         }),
@@ -184,24 +184,24 @@ export const identityRoles = pgTable(
         createdAt: timestamp('created_at', { withTimezone: true })
             .notNull()
             .defaultNow(),
-        expiresAt: timestamp('expires_at', { withTimezone: true }), // Rôles temporaires
+        expiresAt: timestamp('expires_at', { withTimezone: true }), // Temporary roles
     },
     (table) => [
-        // Contrainte d'unicité
+        // Uniqueness constraint
         uniqueIndex('identity_role_unique_idx').on(
             table.identityId,
             table.roleId
         ),
 
-        // Index pour lookup inverse
+        // Index for reverse lookup
         index('identity_role_role_idx').on(table.roleId),
 
-        // Index pour rôles temporaires (cleanup)
+        // Index for temporary roles (cleanup)
         index('identity_role_expires_idx')
             .on(table.expiresAt)
             .where(sql`${table.expiresAt} IS NOT NULL`),
 
-        // Contrainte: expiration future
+        // Constraint: expiration must be in the future
         check(
             'identity_role_expires_future',
             sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
@@ -210,7 +210,7 @@ export const identityRoles = pgTable(
 );
 
 // ============================================================================
-// IDENTITY_PERMISSIONS (Permissions directes)
+// IDENTITY_PERMISSIONS (Direct permissions)
 // ============================================================================
 
 export const identityPermissions = pgTable(
@@ -224,7 +224,7 @@ export const identityPermissions = pgTable(
             .notNull()
             .references(() => permissions.id, { onDelete: 'cascade' }),
 
-        // Traçabilité
+        // Traceability
         grantedBy: uuid('granted_by').references(() => identities.id, {
             onDelete: 'set null',
         }),
@@ -236,21 +236,21 @@ export const identityPermissions = pgTable(
         expiresAt: timestamp('expires_at', { withTimezone: true }),
     },
     (table) => [
-        // Contrainte d'unicité
+        // Uniqueness constraint
         uniqueIndex('identity_permission_unique_idx').on(
             table.identityId,
             table.permissionId
         ),
 
-        // Index pour lookup inverse
+        // Index for reverse lookup
         index('identity_permission_perm_idx').on(table.permissionId),
 
-        // Index pour permissions temporaires
+        // Index for temporary permissions
         index('identity_permission_expires_idx')
             .on(table.expiresAt)
             .where(sql`${table.expiresAt} IS NOT NULL`),
 
-        // Contrainte
+        // Constraint
         check(
             'identity_permission_expires_future',
             sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
@@ -259,7 +259,7 @@ export const identityPermissions = pgTable(
 );
 
 // ============================================================================
-// AUTH_METHOD_PERMISSIONS (Permissions pour PATs/API keys)
+// AUTH_METHOD_PERMISSIONS (Permissions for PATs/API keys)
 // ============================================================================
 
 export const authMethodPermissions = pgTable(
@@ -277,13 +277,13 @@ export const authMethodPermissions = pgTable(
             .defaultNow(),
     },
     (table) => [
-        // Contrainte d'unicité
+        // Uniqueness constraint
         uniqueIndex('auth_method_permission_unique_idx').on(
             table.authMethodId,
             table.permissionId
         ),
 
-        // Index pour l'authMethod (listing des permissions)
+        // Index for authMethod (listing permissions)
         index('auth_method_permission_method_idx').on(table.authMethodId),
     ]
 );

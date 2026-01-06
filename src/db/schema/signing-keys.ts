@@ -17,45 +17,45 @@ export const signingKeys = pgTable(
     {
         id: uuid('id').primaryKey().defaultRandom(),
 
-        // Identifiant unique de la clé
+        // Unique key identifier
         kid: varchar('kid', { length: 64 }).notNull().unique(), // "2025-01-a3f9"
 
-        // Algorithme (enum pour sécurité)
+        // Signing algorithm (enum for security)
         algorithm: signingAlgorithmEnum('algorithm').notNull().default('ES256'),
 
-        // Clés (private chiffrée avec master key)
+        // Keys (private key encrypted with master key)
         privateKeyEncrypted: text('private_key_encrypted').notNull(),
-        publicKey: text('public_key').notNull(), // PEM pour JWKS
+        publicKey: text('public_key').notNull(), // PEM format for JWKS
 
-        // Statut
+        // Status
         isActive: boolean('is_active').notNull().default(true),
 
         // Timestamps
         createdAt: timestamp('created_at', { withTimezone: true })
             .notNull()
             .defaultNow(),
-        rotatedAt: timestamp('rotated_at', { withTimezone: true }), // NULL = clé active
+        rotatedAt: timestamp('rotated_at', { withTimezone: true }), // NULL = active key
         expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
     },
     (table) => [
-        // Lookup par kid (validation JWT)
+        // Lookup by kid (JWT validation)
         uniqueIndex('signing_key_kid_idx').on(table.kid),
 
-        // Clé active la plus récente
+        // Most recent active key
         index('signing_key_active_recent_idx')
             .on(table.isActive, table.createdAt.desc())
             .where(sql`${table.isActive} = true`),
 
-        // Cleanup des clés expirées
+        // Cleanup expired keys
         index('signing_key_expires_idx').on(table.expiresAt),
 
-        // Contrainte: expiration future à la création
+        // Constraint: expiration must be in the future at creation
         check(
             'signing_key_expires_future',
             sql`${table.expiresAt} > ${table.createdAt}`
         ),
 
-        // Contrainte: kid format
+        // Constraint: kid format validation
         check('signing_key_kid_format', sql`${table.kid} ~ '^[a-zA-Z0-9_-]+$'`),
     ]
 );

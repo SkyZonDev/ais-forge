@@ -1,12 +1,9 @@
-import { relations, sql } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import {
     type AnyPgColumn,
-    boolean,
     check,
     index,
     inet,
-    integer,
-    interval,
     jsonb,
     pgTable,
     text,
@@ -15,15 +12,7 @@ import {
     uuid,
     varchar,
 } from 'drizzle-orm/pg-core';
-import {
-    authMethodTypeEnum,
-    eventCategoryEnum,
-    eventSeverityEnum,
-    identityStatusEnum,
-    identityTypeEnum,
-    revokedReasonEnum,
-    signingAlgorithmEnum,
-} from './enum';
+import { authMethodTypeEnum, revokedReasonEnum } from './enum';
 import { identities } from './identities';
 import { organizations } from './organizations';
 
@@ -38,12 +27,12 @@ export const authMethods = pgTable(
             .notNull()
             .references(() => organizations.id, { onDelete: 'cascade' }),
 
-        // Type et identification
+        // Type and identification
         type: authMethodTypeEnum('type').notNull(),
         name: varchar('name', { length: 255 }), // "CI Pipeline PAT", "Mobile App Key"
 
-        // Credentials (jamais en clair)
-        credentialHash: text('credential_hash').notNull(), // argon2id pour passwords, SHA-256 pour tokens
+        // Credentials (never stored in plain text)
+        credentialHash: text('credential_hash').notNull(), // argon2id for passwords, SHA-256 for tokens
 
         // Timestamps
         createdAt: timestamp('created_at', { withTimezone: true })
@@ -53,34 +42,34 @@ export const authMethods = pgTable(
         expiresAt: timestamp('expires_at', { withTimezone: true }),
         revokedAt: timestamp('revoked_at', { withTimezone: true }),
 
-        // Metadata extensible (scopes, IP whitelist, etc.)
+        // Extensible metadata (scopes, IP whitelist, etc.)
         metadata: jsonb('metadata')
             .$type<Record<string, unknown>>()
             .default({})
             .notNull(),
     },
     (table) => [
-        // Recherche des méthodes actives par identité
+        // Lookup active methods by identity
         index('auth_method_identity_active_idx')
             .on(table.identityId, table.type)
             .where(sql`${table.revokedAt} IS NULL`),
 
-        // Index par organisation pour admin
+        // Index by organization for admin
         index('auth_method_org_idx').on(table.organizationId),
 
-        // Cleanup des méthodes révoquées
+        // Cleanup revoked methods
         index('auth_method_revoked_idx')
             .on(table.revokedAt)
             .where(sql`${table.revokedAt} IS NOT NULL`),
 
-        // Index pour expiration (cleanup automatique)
+        // Index for expiration (automatic cleanup)
         index('auth_method_expires_idx')
             .on(table.expiresAt)
             .where(
                 sql`${table.expiresAt} IS NOT NULL AND ${table.revokedAt} IS NULL`
             ),
 
-        // Contrainte: expiration future à la création
+        // Constraint: expiration must be in the future at creation
         check(
             'auth_method_expires_future',
             sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
@@ -102,10 +91,10 @@ export const sessions = pgTable(
         // Theft detection
         tokenFamilyId: uuid('token_family_id').notNull(),
 
-        // Token de session (hashé)
+        // Session token (hashed)
         sessionTokenHash: text('session_token_hash').notNull().unique(),
 
-        // Informations client
+        // Client information
         ipAddress: inet('ip_address').notNull(),
         userAgent: text('user_agent'),
 
@@ -126,28 +115,28 @@ export const sessions = pgTable(
             .notNull(),
     },
     (table) => [
-        // Lookup par token hash (authentification)
+        // Lookup by token hash (authentication)
         uniqueIndex('session_token_hash_idx').on(table.sessionTokenHash),
 
-        // Sessions actives par identité
+        // Active sessions by identity
         index('session_identity_active_idx')
             .on(table.identityId)
             .where(
                 sql`${table.revokedAt} IS NULL AND ${table.expiresAt} > NOW()`
             ),
 
-        // Theft detection par famille
+        // Theft detection by family
         index('session_token_family_idx').on(table.tokenFamilyId),
 
-        // Index pour l'organisation (admin)
+        // Index for organization (admin)
         index('session_org_idx').on(table.organizationId),
 
-        // Cleanup des sessions expirées
+        // Cleanup expired sessions
         index('session_expires_idx')
             .on(table.expiresAt)
             .where(sql`${table.revokedAt} IS NULL`),
 
-        // Contrainte: expiration future
+        // Constraint: expiration must be in the future
         check(
             'session_expires_future',
             sql`${table.expiresAt} > ${table.createdAt}`
@@ -166,7 +155,7 @@ export const refreshTokens = pgTable(
             .notNull()
             .references(() => organizations.id, { onDelete: 'cascade' }),
 
-        // Liens optionnels (session OU authMethod)
+        // Optional links (session OR authMethod)
         sessionId: uuid('session_id').references(() => sessions.id, {
             onDelete: 'cascade',
         }),
@@ -174,7 +163,7 @@ export const refreshTokens = pgTable(
             onDelete: 'cascade',
         }),
 
-        // CRITIQUE: Theft detection
+        // CRITICAL: Theft detection
         tokenFamilyId: uuid('token_family_id').notNull(),
         tokenHash: text('token_hash').notNull().unique(),
         parentTokenId: uuid('parent_token_id').references(
@@ -190,37 +179,37 @@ export const refreshTokens = pgTable(
         expiresAt: timestamp('expires_at', { withTimezone: true }).notNull(),
         revokedAt: timestamp('revoked_at', { withTimezone: true }),
 
-        // Raison de révocation (enum pour cohérence)
+        // Revocation reason (enum for consistency)
         revokedReason: revokedReasonEnum('revoked_reason'),
     },
     (table) => [
-        // Lookup par hash (authentification)
+        // Lookup by hash (authentication)
         uniqueIndex('refresh_token_hash_idx').on(table.tokenHash),
 
-        // Theft detection: tokens actifs par famille
+        // Theft detection: active tokens by family
         index('refresh_token_family_active_idx')
             .on(table.tokenFamilyId)
             .where(sql`${table.revokedAt} IS NULL`),
 
-        // Tokens valides par identité (pour listing)
+        // Valid tokens by identity (for listing)
         index('refresh_token_identity_valid_idx')
             .on(table.identityId, table.expiresAt)
             .where(
                 sql`${table.revokedAt} IS NULL AND ${table.expiresAt} > NOW()`
             ),
 
-        // Cleanup des tokens expirés
+        // Cleanup expired tokens
         index('refresh_token_expires_idx')
             .on(table.expiresAt)
             .where(sql`${table.revokedAt} IS NULL`),
 
-        // Contrainte: expiration future
+        // Constraint: expiration must be in the future
         check(
             'refresh_token_expires_future',
             sql`${table.expiresAt} > ${table.createdAt}`
         ),
 
-        // Contrainte: session XOR authMethod (pas les deux)
+        // Constraint: session XOR authMethod (not both)
         check(
             'refresh_token_source_xor',
             sql`(${table.sessionId} IS NULL) != (${table.authMethodId} IS NULL)`

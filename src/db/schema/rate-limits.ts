@@ -18,7 +18,7 @@ export const rateLimits = pgTable(
     {
         id: uuid('id').primaryKey().defaultRandom(),
 
-        // Contexte (optionnel)
+        // Context (optional)
         organizationId: uuid('organization_id').references(
             () => organizations.id,
             { onDelete: 'cascade' }
@@ -27,42 +27,42 @@ export const rateLimits = pgTable(
             onDelete: 'cascade',
         }),
 
-        // Clé de rate limit: "login:ip:1.2.3.4" ou "api:identity:uuid"
+        // Rate limit key: "login:ip:1.2.3.4" or "api:identity:uuid"
         key: varchar('key', { length: 255 }).notNull(),
 
-        // Fenêtre temporelle
+        // Time window
         windowStart: timestamp('window_start', {
             withTimezone: true,
         }).notNull(),
         windowDuration: interval('window_duration').notNull(),
 
-        // Compteur
+        // Counter
         attemptCount: integer('attempt_count').notNull().default(0),
         lastAttemptAt: timestamp('last_attempt_at', {
             withTimezone: true,
         }).notNull(),
 
-        // Blocage temporaire
+        // Temporary block
         blockedUntil: timestamp('blocked_until', { withTimezone: true }),
     },
     (table) => [
-        // Lookup principal: clé + fenêtre
+        // Primary lookup: key + window
         uniqueIndex('rate_limit_key_window_unique_idx').on(
             table.key,
             table.windowStart
         ),
 
-        // Entrées bloquées (pour vérification rapide)
+        // Blocked entries (for quick verification)
         index('rate_limit_blocked_idx')
             .on(table.blockedUntil)
             .where(
                 sql`${table.blockedUntil} IS NOT NULL AND ${table.blockedUntil} > NOW()`
             ),
 
-        // Cleanup des anciennes fenêtres
+        // Cleanup old windows
         index('rate_limit_window_start_idx').on(table.windowStart),
 
-        // Contrainte: compteur positif
+        // Constraint: positive counter
         check('rate_limit_count_positive', sql`${table.attemptCount} >= 0`),
     ]
 );

@@ -14,7 +14,7 @@ import {
 } from './roles';
 
 // ============================================================================
-// RELATIONS DRIZZLE (Query Builder)
+// DRIZZLE RELATIONS (Query Builder)
 // ============================================================================
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
@@ -40,7 +40,7 @@ export const identitiesRelations = relations(identities, ({ one, many }) => ({
     identityPermissions: many(identityPermissions),
     auditLogs: many(auditLogs),
     rateLimits: many(rateLimits),
-    // Rôles/permissions accordés par cette identité
+    // Roles/permissions granted by this identity
     grantedRoles: many(identityRoles, { relationName: 'grantedBy' }),
     grantedPermissions: many(identityPermissions, {
         relationName: 'grantedBy',

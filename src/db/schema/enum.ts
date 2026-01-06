@@ -25,14 +25,14 @@ export const authMethodTypeEnum = pgEnum('auth_method_type', [
     'api_key',
 ]);
 
-// Raisons de révocation pour traçabilité
+// Revocation reasons for traceability
 export const revokedReasonEnum = pgEnum('revoked_reason', [
-    'used', // Token normal utilisé puis roté
-    'stolen', // Détection de vol (réutilisation)
-    'manual', // Révocation manuelle par l'utilisateur
-    'family_revoked', // Toute la famille de tokens révoquée
-    'expired', // Expiré automatiquement
-    'logout', // Déconnexion volontaire
+    'used', // Normal token used then rotated
+    'stolen', // Theft detection (reuse)
+    'manual', // Manual revocation by user
+    'family_revoked', // Entire token family revoked
+    'expired', // Automatically expired
+    'logout', // Voluntary logout
 ]);
 
 // ============================================================================
@@ -40,21 +40,21 @@ export const revokedReasonEnum = pgEnum('revoked_reason', [
 // ============================================================================
 
 export const signingAlgorithmEnum = pgEnum('signing_algorithm', [
-    // Classiques (production actuelle)
-    'EdDSA', // Ed25519 - Rapide, moderne
-    'ES384', // ECDSA P-384 - Standard industrie
-    'ES256', // ECDSA P-256 - Largement supporté
+    // Classic (current production)
+    'EdDSA', // Ed25519 - Fast, modern
+    'ES384', // ECDSA P-384 - Industry standard
+    'ES256', // ECDSA P-256 - Widely supported
 
-    // Post-quantique FIPS (2025+)
-    'ML-DSA-65', // Dilithium3 - Recommandé NIST Cat-3
-    'ML-DSA-87', // Dilithium5 - Haute sécurité Cat-5
-    'ML-DSA-44', // Dilithium2 - Léger (si besoin)
+    // Post-quantum FIPS (2025+)
+    'ML-DSA-65', // Dilithium3 - NIST Cat-3 recommended
+    'ML-DSA-87', // Dilithium5 - High security Cat-5
+    'ML-DSA-44', // Dilithium2 - Lightweight (if needed)
 
-    // Hash-based (ultra conservatif)
-    'SLH-DSA-SHA2-192f', // SPHINCS+ - Lent mais quantum-safe
+    // Hash-based (ultra conservative)
+    'SLH-DSA-SHA2-192f', // SPHINCS+ - Slow but quantum-safe
 
     // Legacy
-    'RS256', // RSA - Compatibilité (<2030)
+    'RS256', // RSA - Compatibility (<2030)
 ]);
 
 // ============================================================================
@@ -62,18 +62,18 @@ export const signingAlgorithmEnum = pgEnum('signing_algorithm', [
 // ============================================================================
 
 export const eventCategoryEnum = pgEnum('event_category', [
-    'auth', // Authentification
-    'permission', // Changements de permissions
-    'admin', // Actions administratives
-    'security', // Événements de sécurité
-    'identity', // Gestion des identités
-    'token', // Opérations sur les tokens
+    'auth', // Authentication
+    'permission', // Permission changes
+    'admin', // Administrative actions
+    'security', // Security events
+    'identity', // Identity management
+    'token', // Token operations
 ]);
 
 export const eventSeverityEnum = pgEnum('event_severity', [
-    'debug', // Debugging uniquement
-    'info', // Information normale
-    'warning', // Attention requise
-    'error', // Erreur non-critique
-    'critical', // Incident de sécurité
+    'debug', // Debugging only
+    'info', // Normal information
+    'warning', // Attention required
+    'error', // Non-critical error
+    'critical', // Security incident
 ]);

@@ -14,7 +14,7 @@ export const organizations = pgTable(
     {
         id: uuid('id').primaryKey().defaultRandom(),
 
-        // Identifiants
+        // Identifiers
         slug: varchar('slug', { length: 63 }).notNull().unique(), // DNS-safe, max 63 chars
         name: varchar('name', { length: 255 }).notNull(),
 
@@ -27,24 +27,24 @@ export const organizations = pgTable(
             .defaultNow(),
         deletedAt: timestamp('deleted_at', { withTimezone: true }),
 
-        // Metadata extensible
+        // Extensible metadata
         metadata: jsonb('metadata')
             .$type<Record<string, unknown>>()
             .default({})
             .notNull(),
     },
     (table) => [
-        // Index partiel pour les orgs actives (exclut soft-deleted)
+        // Partial index for active orgs (excludes soft-deleted)
         index('org_active_slug_idx')
             .on(table.slug)
             .where(sql`${table.deletedAt} IS NULL`),
 
-        // Index pour le cleanup des soft-deleted
+        // Index for soft-deleted cleanup
         index('org_deleted_at_idx')
             .on(table.deletedAt)
             .where(sql`${table.deletedAt} IS NOT NULL`),
 
-        // Contrainte: slug format DNS-safe
+        // Constraint: DNS-safe slug format
         check(
             'org_slug_format',
             sql`${table.slug} ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'`

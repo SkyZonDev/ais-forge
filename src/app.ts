@@ -3,7 +3,7 @@ import { config } from './config';
 
 export async function buildApp(): Promise<FastifyInstance> {
     const app = fastify({
-        logger: false,
+        logger: true,
         ignoreTrailingSlash: true,
         caseSensitive: false,
         requestTimeout: 30000,

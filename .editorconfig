@@ -1,0 +1,52 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+max_line_length = 80
+
+[*.{js,jsx,ts,tsx,mjs,mts,cts}]
+quote_type = single
+quote_properties = as-needed
+semi = true
+
+[*.json]
+indent_style = space
+indent_size = 4
+
+[*.{css,scss,sass,pcss}]
+indent_style = space
+indent_size = 4
+
+[*.{html,htm,jsx,tsx}]
+indent_style = space
+indent_size = 4
+trim_trailing_whitespace = false
+
+[**/node_modules/**]
+indent_style = unset
+
+[**/dist/**]
+indent_style = unset
+
+[**/build/**]
+indent_style = unset
+
+[**/coverage/**]
+indent_style = unset
+
+[**/.turbo/**]
+indent_style = unset
+
+[**/.nx/**]
+indent_style = unset
+
+[**/.pnpm-store/**]
+indent_style = unset
+
+[**/out/**]
+indent_style = unset

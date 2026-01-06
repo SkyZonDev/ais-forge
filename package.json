@@ -1,0 +1,24 @@
+{
+    "name": "AIS Forge",
+    "version": "0.0.1-beta",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "lint": "biome check .",
+        "lint:fix": "biome check --write .",
+        "test": "echo \"Error: no test specified\" && exit 0"
+    },
+    "keywords": [],
+    "author": "SkyZon - Jean-Pierre Dupuis",
+    "license": "Apache-2.0",
+    "packageManager": "pnpm@10.22.0",
+    "devDependencies": {
+        "@types/node": "^25.0.3",
+        "tsup": "^8.5.1",
+        "typescript": "^5.9.3"
+    },
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "fastify": "^5.6.2"
+    }
+}

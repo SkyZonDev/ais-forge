@@ -8,7 +8,7 @@
 [![Drizzle](https://img.shields.io/badge/Drizzle-ORM-C5F74F?style=flat-square&logo=drizzle&logoColor=black)](https://orm.drizzle.team/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0%2B-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/License-Apache--2.0-green?style=flat-square)](LICENSE.md)
-[![CI](https://img.shields.io/github/actions/workflow/status/yourusername/ais-forge/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/SkyZonDev/ais-forge/actions)
+[![CI](https://img.shields.io/github/actions/workflow/status/SkyZonDev/ais-forge/ci.yml?style=flat-square&logo=github&label=CI)](https://github.com/SkyZonDev/ais-forge/actions)
 
 </div>
 

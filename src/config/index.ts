@@ -12,8 +12,8 @@ export const config = {
     trusted_origins: [
         ...(process.env.TRUSTED_ORIGINS
             ? process.env.TRUSTED_ORIGINS.split(',').map((origin) =>
-                origin.trim()
-            )
+                  origin.trim()
+              )
             : []),
         ...(process.env.VERCEL_URL ? [process.env.VERCEL_URL] : []),
     ],

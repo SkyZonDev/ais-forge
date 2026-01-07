@@ -1,5 +1,6 @@
 import { buildApp } from './app';
 import { config } from './config';
+import { closeDatabaseConnection } from './utils/db';
 
 async function start() {
     const app = await buildApp();
@@ -10,6 +11,7 @@ async function start() {
         app.log.info(`Received ${signal}. Shutting down API...`);
         try {
             await app.close();
+            await closeDatabaseConnection();
             app.log.info('Graceful shutdown completed');
             process.exit(0);
         } catch (error) {

@@ -4,6 +4,7 @@
         "module": "esnext",
         "target": "esnext",
         "moduleResolution": "bundler",
+        "resolveJsonModule": true,
         "lib": ["esnext"],
         "types": ["node"],
         "sourceMap": true,
@@ -19,5 +20,6 @@
         "moduleDetection": "force",
         "skipLibCheck": true
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["**/dist/**", "**/node_modules/**"]
 }

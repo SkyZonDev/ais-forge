@@ -17,4 +17,7 @@ export const config = {
             : []),
         ...(process.env.VERCEL_URL ? [process.env.VERCEL_URL] : []),
     ],
+    db: {
+        pgUrl: process.env.DATABASE_URL,
+    },
 };

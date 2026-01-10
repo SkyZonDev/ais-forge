@@ -1,7 +1,7 @@
 import { auditRepository } from '../../db/repository/audit.repository';
 import { authMethodsRepository } from '../../db/repository/auth/auth-methods.repository';
 import { identitiesRepository } from '../../db/repository/identities.repository';
-import { ApiError } from '../../utils/api-error';
+import { ApiError } from '../../utils/api/api-error';
 import { hashPassword, verifyPassword } from '../../utils/crypto';
 
 interface SigninData {
@@ -75,7 +75,9 @@ export async function signin(data: SigninData) {
     });
 
     return {
-        success: true,
+        id: identity.id,
+        email: identity.email,
+        displayName: identity.displayName,
     };
 }
 
@@ -117,6 +119,8 @@ export async function signup(data: SignupData) {
     });
 
     return {
-        success: true,
+        id: identity.id,
+        email: identity.email,
+        displayName: identity.displayName,
     };
 }

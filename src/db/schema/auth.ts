@@ -121,9 +121,7 @@ export const sessions = pgTable(
         // Active sessions by identity
         index('session_identity_active_idx')
             .on(table.identityId)
-            .where(
-                sql`${table.revokedAt} IS NULL AND ${table.expiresAt} > NOW()`
-            ),
+            .where(sql`${table.revokedAt} IS NULL`),
 
         // Theft detection by family
         index('session_token_family_idx').on(table.tokenFamilyId),
@@ -194,9 +192,7 @@ export const refreshTokens = pgTable(
         // Valid tokens by identity (for listing)
         index('refresh_token_identity_valid_idx')
             .on(table.identityId, table.expiresAt)
-            .where(
-                sql`${table.revokedAt} IS NULL AND ${table.expiresAt} > NOW()`
-            ),
+            .where(sql`${table.revokedAt} IS NULL`),
 
         // Cleanup expired tokens
         index('refresh_token_expires_idx')

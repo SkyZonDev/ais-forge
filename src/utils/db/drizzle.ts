@@ -1,9 +1,10 @@
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
+import { config } from '../../config';
 import * as schema from '../../db/schema';
 
 const pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: config.db.pgUrl,
     max: 10,
     min: 2,
     idleTimeoutMillis: 30000,
@@ -11,6 +12,7 @@ const pool = new Pool({
     keepAlive: true,
     keepAliveInitialDelayMillis: 10000,
     allowExitOnIdle: false,
+    log: console.log,
 });
 
 pool.on('error', (err) => {
@@ -22,12 +24,12 @@ pool.on('connect', () => {
     console.log('New database connection established');
 });
 
-export const db = drizzle(pool, {
+const db = drizzle(pool, {
     schema,
     logger: process.env.NODE_ENV === 'development',
 });
 
-export async function checkDatabaseHealth(): Promise<boolean> {
+async function checkDatabaseHealth(): Promise<boolean> {
     try {
         await pool.query('SELECT 1');
         return true;
@@ -37,10 +39,10 @@ export async function checkDatabaseHealth(): Promise<boolean> {
     }
 }
 
-export async function closeDatabaseConnection(): Promise<void> {
+async function closeDatabaseConnection(): Promise<void> {
     console.log('Closing database connections...');
     await pool.end();
     console.log('Database connections closed');
 }
 
-export { pool };
+export { db, pool, checkDatabaseHealth, closeDatabaseConnection };

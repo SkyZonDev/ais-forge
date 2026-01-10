@@ -1,4 +1,5 @@
 import fastify, { type FastifyInstance } from 'fastify';
+import { routes } from './api';
 import { config } from './config';
 
 export async function buildApp(): Promise<FastifyInstance> {
@@ -14,6 +15,8 @@ export async function buildApp(): Promise<FastifyInstance> {
         trustProxy: config.isProduction,
         disableRequestLogging: config.isProduction,
     });
+
+    app.register(routes);
 
     return app;
 }

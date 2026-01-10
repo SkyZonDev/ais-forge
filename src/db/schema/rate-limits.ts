@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { isNotNull, sql } from 'drizzle-orm';
 import {
     check,
     index,
@@ -55,9 +55,7 @@ export const rateLimits = pgTable(
         // Blocked entries (for quick verification)
         index('rate_limit_blocked_idx')
             .on(table.blockedUntil)
-            .where(
-                sql`${table.blockedUntil} IS NOT NULL AND ${table.blockedUntil} > NOW()`
-            ),
+            .where(isNotNull(table.blockedUntil)),
 
         // Cleanup old windows
         index('rate_limit_window_start_idx').on(table.windowStart),

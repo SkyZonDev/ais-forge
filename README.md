@@ -105,7 +105,7 @@ AIS Forge adopts proven cryptographic patterns without the overhead of interacti
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ais-forge.git
+git clone https://github.com/SkyZonDev/ais-forge.git
 cd ais-forge
 
 # Install dependencies

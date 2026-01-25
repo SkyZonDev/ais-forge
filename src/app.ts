@@ -1,6 +1,8 @@
 import fastify, { type FastifyInstance } from 'fastify';
 import { routes } from './api';
 import { config } from './config';
+import { initializeSigningKeys } from './core/keys/services';
+import { checkDatabaseHealth } from './utils/db';
 
 export async function buildApp(): Promise<FastifyInstance> {
     const app = fastify({
@@ -17,6 +19,17 @@ export async function buildApp(): Promise<FastifyInstance> {
     });
 
     app.register(routes);
+
+    const healthDb = await checkDatabaseHealth();
+    if (!healthDb) {
+        app.log.error('Database not healthy');
+        process.exit(1);
+    }
+
+    const initialKey = await initializeSigningKeys();
+    if (initialKey) {
+        console.log(`Created initial signing key: ${initialKey.kid}`);
+    }
 
     return app;
 }

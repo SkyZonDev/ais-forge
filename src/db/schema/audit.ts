@@ -20,9 +20,10 @@ export const auditLogs = pgTable(
     'audit_logs',
     {
         id: uuid('id').primaryKey().defaultRandom(),
-        organizationId: uuid('organization_id')
-            .notNull()
-            .references(() => organizations.id, { onDelete: 'cascade' }),
+        organizationId: uuid('organization_id').references(
+            () => organizations.id,
+            { onDelete: 'set null' }
+        ),
 
         // Actor (can be null for failed attempts)
         identityId: uuid('identity_id').references(() => identities.id, {

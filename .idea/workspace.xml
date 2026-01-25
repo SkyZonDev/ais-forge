@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="feat(auth): implement API response handling and authentication routes">
+      <change afterPath="$PROJECT_DIR$/src/constants/crypto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/core/keys/services.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/db/repository/keys.repository.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/db/repository/session.repository.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/types/auth.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/types/crypto.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/types/refresh-tokens.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/types/sessions.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/encryption.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/index.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/keys.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/password.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/crypto/signing.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/db/redis.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/ip.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/v1/health/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/health/route.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/auth/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/auth/services.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/repository/organizations.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/organizations.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/audit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/audit.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/audit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/audit.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/auth-methods.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/auth-methods.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/identities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/identities.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/db/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/db/index.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="DatabaseLocalColorSettings">
+    <colors>
+      <entry key="a207703d-5d30-42be-b5ca-4dad54fd00d9" value="Blue" />
+    </colors>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;SkyZonDev&quot;
+  }
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/SkyZonDev/ais-forge.git&quot;,
+    &quot;accountId&quot;: &quot;2e097b3e-7e0b-4005-a414-3c60411ae2ee&quot;
+  }
+}</component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="382T0TSqB0vDvZsfxtwY9SuAw8Y" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feat/simple-auth&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/workstation/dev/ais-forge&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;D:\\workstation\\dev\\ais-forge\\node_modules\\typescript\\lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
+    ],
+    &quot;com.intellij.ide.scratch.LRUPopupBuilder$1/SQL Dialect&quot;: [
+      &quot;PostgreSQL&quot;
+    ]
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workstation\dev\ais-forge\src" />
+      <recent name="D:\workstation\dev\ais-forge\src\utils\api" />
+    </key>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-a71380e98a7c-JavaScript-WS-252.28238.10" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="" />
+      <created>1767996442599</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1767996442599</updated>
+      <workItem from="1767996443838" duration="7000" />
+      <workItem from="1767996502439" duration="12494000" />
+      <workItem from="1768056685202" duration="23619000" />
+      <workItem from="1769357577515" duration="302000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/app.ts</url>
+          <option name="timeStamp" value="26" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/types/pagination.ts</url>
+          <line>49</line>
+          <option name="timeStamp" value="38" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="github-copilot-workspace">
+    <instructionFileLocations>
+      <option value=".github/instructions" />
+    </instructionFileLocations>
+    <promptFileLocations>
+      <option value=".github/prompts" />
+    </promptFileLocations>
+  </component>
+</project>

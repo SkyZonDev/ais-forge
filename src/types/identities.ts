@@ -12,6 +12,7 @@ export interface IdentityPublic {
     id: string;
     displayName: string;
     email: string | null;
+    organizationId: string;
 }
 
 /** Complete representation of an identity */

@@ -10,7 +10,6 @@ import * as schema from '../schema';
 import {
     _buildPaginatedResult,
     buildCursorCondition,
-    type Cursor,
     decodeCursor,
     type PaginatedResult,
 } from './utils';

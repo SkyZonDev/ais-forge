@@ -1,6 +1,6 @@
 import * as schema from '../db/schema';
 import { authMethodType } from '../db/schema/enum';
-import type { Cursor } from './pagination';
+import type { Cursor, CursorPaginationOptions } from './pagination';
 
 /**
  * Represents a raw auth method record from the database.
@@ -23,11 +23,7 @@ type AuthMethodType = (typeof authMethodType)[number];
 /**
  * Options for paginated queries on auth methods.
  */
-interface AuthMethodPaginationOptions {
-    /** Maximum number of items to return (default: 20) */
-    limit?: number;
-    /** Cursor for forward pagination (older records) */
-    cursor?: Cursor;
+interface AuthMethodPaginationOptions extends CursorPaginationOptions {
     /** Whether to include revoked methods (default: false) */
     includeRevoked?: boolean;
     /** Whether to include expired methods (default: false) */
@@ -40,18 +36,6 @@ interface AuthMethodPaginationOptions {
 interface UpdateMetadataOptions {
     /** Merge with existing metadata (true) or replace entirely (false) */
     merge?: boolean;
-}
-
-/**
- * Result of a revocation operation.
- */
-interface RevocationResult {
-    /** Whether the revocation was successful */
-    success: boolean;
-    /** The revoked auth method, or null if not found */
-    authMethod: AuthMethod | null;
-    /** Reason for revocation failure, if any */
-    error?: string;
 }
 
 /**
@@ -74,6 +58,5 @@ export type {
     AuthMethodType,
     AuthMethodPaginationOptions,
     UpdateMetadataOptions,
-    RevocationResult,
     AuthMethodStats,
 };

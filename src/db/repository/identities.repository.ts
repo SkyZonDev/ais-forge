@@ -96,6 +96,7 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
+                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
             .where(
@@ -131,6 +132,7 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
+                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
             .where(
@@ -169,6 +171,7 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
+                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
             .where(

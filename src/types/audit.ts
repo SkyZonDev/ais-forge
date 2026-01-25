@@ -19,7 +19,7 @@ interface AuditLogFilterOptions {
 
 /** Données pour créer un log */
 interface CreateAuditLogData {
-    organizationId: string;
+    organizationId?: string;
     identityId?: string;
     sessionId?: string;
     authMethodId?: string;

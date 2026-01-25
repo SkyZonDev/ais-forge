@@ -10,13 +10,13 @@ import {
     SQL,
     sql,
 } from 'drizzle-orm';
+import type { RevocationResult } from '../../../types/auth';
 import type {
     AuthMethod,
     AuthMethodInsert,
     AuthMethodPaginationOptions,
     AuthMethodStats,
     AuthMethodType,
-    RevocationResult,
     UpdateMetadataOptions,
 } from '../../../types/auth-methods';
 import { db } from '../../../utils/db';
@@ -707,18 +707,18 @@ export const authMethodsRepository = {
      * }
      * ```
      */
-    async revoke(id: string): Promise<RevocationResult> {
+    async revoke(id: string): Promise<RevocationResult<AuthMethod>> {
         // Check current state
         const existing = await this.findById(id);
 
         if (!existing) {
-            return { success: false, authMethod: null, error: 'not_found' };
+            return { success: false, data: null, error: 'not_found' };
         }
 
         if (existing.revokedAt) {
             return {
                 success: false,
-                authMethod: existing,
+                data: existing,
                 error: 'already_revoked',
             };
         }
@@ -729,7 +729,7 @@ export const authMethodsRepository = {
             .where(eq(schema.authMethods.id, id))
             .returning();
 
-        return { success: true, authMethod: revoked! };
+        return { success: true, data: revoked! };
     },
 
     /**
@@ -999,16 +999,16 @@ export const authMethodsRepository = {
             .select({
                 total: count(),
                 revoked: count(schema.authMethods.revokedAt),
-                expired: sql<number>`COUNT(CASE 
-                    WHEN ${schema.authMethods.expiresAt} IS NOT NULL 
+                expired: sql<number>`COUNT(CASE
+                    WHEN ${schema.authMethods.expiresAt} IS NOT NULL
                     AND ${schema.authMethods.expiresAt} < ${now}
                     AND ${schema.authMethods.revokedAt} IS NULL
-                    THEN 1 
+                    THEN 1
                 END)`,
-                active: sql<number>`COUNT(CASE 
-                    WHEN ${schema.authMethods.revokedAt} IS NULL 
+                active: sql<number>`COUNT(CASE
+                    WHEN ${schema.authMethods.revokedAt} IS NULL
                     AND (${schema.authMethods.expiresAt} IS NULL OR ${schema.authMethods.expiresAt} >= ${now})
-                    THEN 1 
+                    THEN 1
                 END)`,
             })
             .from(schema.authMethods)

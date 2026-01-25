@@ -1,6 +1,6 @@
+import { authMethodType } from '../db';
 import * as schema from '../db/schema';
-import { authMethodType } from '../db/schema/enum';
-import type { Cursor, CursorPaginationOptions } from './pagination';
+import type { CursorPaginationOptions } from './pagination';
 
 /**
  * Represents a raw auth method record from the database.

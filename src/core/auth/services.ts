@@ -147,7 +147,7 @@ export async function logout(sessionId: string) {
     await refreshTokenRepository.revokeBySessionId(sessionId, 'logout');
     const result = await sessionsRepository.revoke(sessionId);
     if (!result.success) {
-        throw new ApiError(result.message, 400, result.error)
+        throw new ApiError(result.message, 400, result.error);
     }
     return result.data;
 }

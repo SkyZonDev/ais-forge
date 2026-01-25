@@ -2,7 +2,7 @@ import { revokedReason } from '../db';
 
 type RevokedReason = (typeof revokedReason)[number];
 type RevocationResult<T> = {
-    message: string,
+    message: string;
     /** Whether the revocation was successful */
     success: boolean;
     /** The revoked result, or null if not found */

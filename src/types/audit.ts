@@ -1,4 +1,4 @@
-import { eventCategory, eventSeverity } from '../db/schema/enum';
+import { eventCategory, eventSeverity } from '../db';
 
 type EventCategory = (typeof eventCategory)[number];
 type EventSeverity = (typeof eventSeverity)[number];

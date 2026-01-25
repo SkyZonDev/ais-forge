@@ -27,7 +27,7 @@ export async function signup(req: FastifyRequest, res: FastifyReply) {
 
 export async function logout(req: FastifyRequest, res: FastifyReply) {
     try {
-        const sessionId = req.headers["session-id"] as string;
+        const sessionId = req.headers['session-id'] as string;
         await authServices.logout(sessionId);
         return ApiResponse.success(res, {});
     } catch (e) {

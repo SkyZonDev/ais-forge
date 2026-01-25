@@ -981,14 +981,20 @@ export const refreshTokenRepository = {
         const existing = await this.findById(id);
 
         if (!existing) {
-            return { success: false, data: null, error: 'not_found' };
+            return {
+                success: false,
+                data: null,
+                message: 'Refresh token not found',
+                error: 'REFRESH_TOKEN_NOT_FOUND',
+            };
         }
 
         if (existing.revokedAt) {
             return {
                 success: false,
                 data: existing,
-                error: 'already_revoked',
+                message: 'Refresh token already revoked',
+                error: 'REFRESH_TOKEN_ALREADY_REVOKED',
             };
         }
 
@@ -1004,7 +1010,7 @@ export const refreshTokenRepository = {
         // Invalidate cache
         await _invalidateTokenCache(existing.tokenHash);
 
-        return { success: true, data: revoked! };
+        return { success: true, message: 'Success', data: revoked! };
     },
 
     /**

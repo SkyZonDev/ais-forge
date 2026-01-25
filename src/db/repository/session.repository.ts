@@ -827,8 +827,8 @@ export const sessionsRepository = {
             return {
                 success: false,
                 data: null,
-                message: "Session not found",
-                error: 'SESSION_NOT_FOUND'
+                message: 'Session not found',
+                error: 'SESSION_NOT_FOUND',
             };
         }
 
@@ -836,7 +836,7 @@ export const sessionsRepository = {
             return {
                 success: false,
                 data: existing,
-                message: "Session already revoked",
+                message: 'Session already revoked',
                 error: 'SESSION_ALREADY_REVOKED',
             };
         }
@@ -850,7 +850,7 @@ export const sessionsRepository = {
         // Invalidate cache
         await _invalidateSessionCache(existing.sessionTokenHash);
 
-        return { success: true, message: "Succes", data: revoked! };
+        return { success: true, message: 'Succes', data: revoked! };
     },
 
     /**

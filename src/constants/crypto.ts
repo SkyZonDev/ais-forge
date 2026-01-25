@@ -2,37 +2,7 @@
  * @fileoverview Cryptographic constants and algorithm instances.
  * @module utils/crypto/constants
  */
-
-import { ml_dsa44, ml_dsa65, ml_dsa87 } from '@noble/post-quantum/ml-dsa.js';
-import {
-    slh_dsa_sha2_192f,
-    slh_dsa_shake_192f,
-} from '@noble/post-quantum/slh-dsa.js';
-
-import type { ClassicAlgorithm, SigningAlgorithm } from '../types/crypto';
-
-// ============================================================================
-// POST-QUANTUM ALGORITHM INSTANCES
-// ============================================================================
-
-/**
- * ML-DSA (Dilithium) algorithm instances mapped by algorithm name.
- * @see NIST FIPS 204
- */
-export const ML_DSA_INSTANCES = {
-    'ML-DSA-44': ml_dsa44,
-    'ML-DSA-65': ml_dsa65,
-    'ML-DSA-87': ml_dsa87,
-} as const;
-
-/**
- * SLH-DSA (SPHINCS+) algorithm instances mapped by algorithm name.
- * @see NIST FIPS 205
- */
-export const SLH_DSA_INSTANCES = {
-    'SLH-DSA-SHA2-192f': slh_dsa_sha2_192f,
-    'SLH-DSA-SHAKE-192f': slh_dsa_shake_192f,
-} as const;
+import type { SigningAlgorithm } from '../types/crypto';
 
 // ============================================================================
 // DURATION PARSING
@@ -74,52 +44,4 @@ export function parseDuration(duration: string): number {
 
     const [, value, unit] = match;
     return parseInt(value!, 10) * DURATION_UNITS[unit!]!;
-}
-
-// ============================================================================
-// ALGORITHM TYPE GUARDS
-// ============================================================================
-
-/** Classic algorithms array for type checking */
-export const CLASSIC_ALGORITHMS: ClassicAlgorithm[] = [
-    'EdDSA',
-    'ES256',
-    'ES384',
-    'RS256',
-];
-
-/**
- * Type guard to check if algorithm is a classic (jose-supported) algorithm.
- *
- * @param algorithm - Algorithm to check
- * @returns True if algorithm is classic (EdDSA, ES256, ES384, RS256)
- */
-export function isClassicAlgorithm(
-    algorithm: SigningAlgorithm
-): algorithm is ClassicAlgorithm {
-    return CLASSIC_ALGORITHMS.includes(algorithm as ClassicAlgorithm);
-}
-
-/**
- * Type guard to check if algorithm is ML-DSA (Dilithium).
- *
- * @param algorithm - Algorithm to check
- * @returns True if algorithm is ML-DSA-44, ML-DSA-65, or ML-DSA-87
- */
-export function isMLDSAAlgorithm(
-    algorithm: SigningAlgorithm
-): algorithm is 'ML-DSA-44' | 'ML-DSA-65' | 'ML-DSA-87' {
-    return algorithm.startsWith('ML-DSA-');
-}
-
-/**
- * Type guard to check if algorithm is SLH-DSA (SPHINCS+).
- *
- * @param algorithm - Algorithm to check
- * @returns True if algorithm is SLH-DSA variant
- */
-export function isSLHDSAAlgorithm(
-    algorithm: SigningAlgorithm
-): algorithm is 'SLH-DSA-SHA2-192f' {
-    return algorithm.startsWith('SLH-DSA-');
 }

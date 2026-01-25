@@ -38,15 +38,6 @@ export const signingAlgorithm = [
     'EdDSA', // Ed25519 - Fast, modern
     'ES384', // ECDSA P-384 - Industry standard
     'ES256', // ECDSA P-256 - Widely supported
-
-    // Post-quantum FIPS (2025+)
-    'ML-DSA-65', // Dilithium3 - NIST Cat-3 recommended
-    'ML-DSA-87', // Dilithium5 - High security Cat-5
-    'ML-DSA-44', // Dilithium2 - Lightweight (if needed)
-
-    // Hash-based (ultra conservative)
-    'SLH-DSA-SHA2-192f', // SPHINCS+ - Slow but quantum-safe
-
     // Legacy
     'RS256', // RSA - Compatibility (<2030)
 ] as const;

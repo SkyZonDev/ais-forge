@@ -15,6 +15,13 @@
             "when": 1768015487833,
             "tag": "0001_lovely_dark_phoenix",
             "breakpoints": true
+        },
+        {
+            "idx": 2,
+            "version": "7",
+            "when": 1769364760874,
+            "tag": "0002_silky_ender_wiggin",
+            "breakpoints": true
         }
     ]
 }

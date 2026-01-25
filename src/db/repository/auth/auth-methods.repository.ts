@@ -712,14 +712,20 @@ export const authMethodsRepository = {
         const existing = await this.findById(id);
 
         if (!existing) {
-            return { success: false, data: null, error: 'not_found' };
+            return {
+                success: false,
+                data: null,
+                message: 'Auth method not found',
+                error: 'AUTH_METHOD_NOT_FOUND',
+            };
         }
 
         if (existing.revokedAt) {
             return {
                 success: false,
                 data: existing,
-                error: 'already_revoked',
+                message: 'Auth method already revoked',
+                error: 'AUTH_METHOD_ALREADY_REVOKED',
             };
         }
 
@@ -729,7 +735,7 @@ export const authMethodsRepository = {
             .where(eq(schema.authMethods.id, id))
             .returning();
 
-        return { success: true, data: revoked! };
+        return { success: true, message: 'Success', data: revoked! };
     },
 
     /**

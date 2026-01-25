@@ -52,7 +52,6 @@
 // ============================================================================
 
 export type {
-    ClassicAlgorithm,
     EncryptedKeyPair,
     JWTClaims,
     JWTErrorCode,
@@ -60,10 +59,8 @@ export type {
     JWTVerifyOptions,
     JWTVerifyResult,
     KeyPair,
-    MLDSAAlgorithm,
     SignatureResult,
     SigningAlgorithm,
-    SLHDSAAlgorithm,
 } from '../../types/crypto';
 
 export { JWTVerificationError } from '../../types/crypto';
@@ -73,11 +70,7 @@ export { JWTVerificationError } from '../../types/crypto';
 // ============================================================================
 
 export {
-    CLASSIC_ALGORITHMS,
     DURATION_UNITS,
-    isClassicAlgorithm,
-    isMLDSAAlgorithm,
-    isSLHDSAAlgorithm,
     parseDuration,
 } from '../../constants/crypto';
 
@@ -86,12 +79,6 @@ export {
 // ============================================================================
 
 export { hashPassword, verifyPassword } from './password.js';
-
-// ============================================================================
-// KEY GENERATION
-// ============================================================================
-
-export { generateKeyPair, generateKid } from './keys.js';
 
 // ============================================================================
 // SIGNING OPERATIONS

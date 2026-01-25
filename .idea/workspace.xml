@@ -5,47 +5,40 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="feat(auth): implement API response handling and authentication routes">
-      <change afterPath="$PROJECT_DIR$/src/constants/crypto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/core/keys/services.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/repository/keys.repository.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/db/repository/session.repository.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/types/auth.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/types/crypto.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/types/refresh-tokens.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/types/sessions.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/encryption.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/keys.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/password.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/crypto/signing.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/db/redis.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/ip.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/master-key.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SECURITY.md" beforeDir="false" afterPath="$PROJECT_DIR$/SECURITY.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/health/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/health/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/constants/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/constants/crypto.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/core/auth/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/auth/services.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/core/keys/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/keys/services.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/organizations.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/organizations.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/audit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/audit.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/repository/session.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/session.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/db/schema/enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/enum.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/types/audit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/audit.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/types/auth-methods.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/auth-methods.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/identities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/identities.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/db/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/db/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/auth.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/crypto.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto/keys.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/crypto/signing.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/signing.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/ip.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ip.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CopilotPersistence">
+    <persistenceIdMap>
+      <entry key="_C:/Users/skyzo/WebstormProjects/ais-forge" value="382T0TSqB0vDvZsfxtwY9SuAw8Y" />
+    </persistenceIdMap>
   </component>
   <component name="DatabaseLocalColorSettings">
     <colors>
@@ -64,7 +57,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/SkyZonDev/ais-forge.git&quot;,
-    &quot;accountId&quot;: &quot;2e097b3e-7e0b-4005-a414-3c60411ae2ee&quot;
+    &quot;accountId&quot;: &quot;dfd224f4-e82c-4db5-b741-d75453d41d01&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -96,7 +89,7 @@
     &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
     &quot;nodejs_package_manager_path&quot;: &quot;pnpm&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
-    &quot;ts.external.directory.path&quot;: &quot;D:\\workstation\\dev\\ais-forge\\node_modules\\typescript\\lib&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;C:\\Users\\skyzo\\WebstormProjects\\ais-forge\\node_modules\\typescript\\lib&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
   &quot;keyToStringList&quot;: {
@@ -132,6 +125,8 @@
       <workItem from="1767996502439" duration="12494000" />
       <workItem from="1768056685202" duration="23619000" />
       <workItem from="1769357577515" duration="302000" />
+      <workItem from="1769358784396" duration="1072000" />
+      <workItem from="1769361004602" duration="6682000" />
     </task>
     <servers />
   </component>
@@ -149,6 +144,12 @@
           <url>file://$PROJECT_DIR$/src/types/pagination.ts</url>
           <line>49</line>
           <option name="timeStamp" value="38" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/src/core/keys/services.ts</url>
+          <line>240</line>
+          <properties lambdaOrdinal="-1" />
+          <option name="timeStamp" value="43" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

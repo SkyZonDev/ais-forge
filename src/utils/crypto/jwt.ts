@@ -4,27 +4,14 @@
  */
 
 import * as jose from 'jose';
-
-import {
-    isClassicAlgorithm,
-    isMLDSAAlgorithm,
-    isSLHDSAAlgorithm,
-    ML_DSA_INSTANCES,
-    parseDuration,
-    SLH_DSA_INSTANCES,
-} from '../../constants/crypto';
 import type {
-    ClassicAlgorithm,
     JWTClaims,
     JWTHeader,
     JWTVerifyOptions,
     JWTVerifyResult,
-    MLDSAAlgorithm,
     SigningAlgorithm,
-    SLHDSAAlgorithm,
 } from '../../types/crypto';
 import { JWTVerificationError } from '../../types/crypto';
-import { signMessage } from './signing.js';
 
 // ============================================================================
 // JWT CREATION
@@ -63,62 +50,17 @@ export async function createJWT(
     kid: string,
     expiresIn?: string
 ): Promise<string> {
-    // Classic algorithms: use standard jose JWT
-    if (isClassicAlgorithm(algorithm)) {
-        const key = await jose.importPKCS8(privateKey, algorithm);
+    const key = await jose.importPKCS8(privateKey, algorithm);
 
-        const jwt = new jose.SignJWT(payload)
-            .setProtectedHeader({ alg: algorithm, kid })
-            .setIssuedAt();
+    const jwt = new jose.SignJWT(payload)
+        .setProtectedHeader({ alg: algorithm, kid })
+        .setIssuedAt();
 
-        if (expiresIn) {
-            jwt.setExpirationTime(expiresIn);
-        }
-
-        return jwt.sign(key);
+    if (expiresIn) {
+        jwt.setExpirationTime(expiresIn);
     }
 
-    // Post-quantum algorithms: custom JWT structure
-    return createPostQuantumJWT(payload, privateKey, algorithm, kid, expiresIn);
-}
-
-/**
- * Creates a JWT with post-quantum signature.
- * Structure: header.payload.signature (all base64url-encoded)
- */
-async function createPostQuantumJWT(
-    payload: Record<string, unknown>,
-    privateKey: string,
-    algorithm: SigningAlgorithm,
-    kid: string,
-    expiresIn?: string
-): Promise<string> {
-    const header = { alg: algorithm, kid, typ: 'JWT' };
-
-    const now = Math.floor(Date.now() / 1000);
-    const claims = {
-        ...payload,
-        iat: now,
-        ...(expiresIn && { exp: now + parseDuration(expiresIn) }),
-    };
-
-    const headerB64 = Buffer.from(JSON.stringify(header)).toString('base64url');
-    const payloadB64 = Buffer.from(JSON.stringify(claims)).toString(
-        'base64url'
-    );
-    const message = `${headerB64}.${payloadB64}`;
-
-    const { signature } = await signMessage(
-        message,
-        privateKey,
-        algorithm,
-        kid
-    );
-    const signatureB64url = Buffer.from(signature, 'base64').toString(
-        'base64url'
-    );
-
-    return `${message}.${signatureB64url}`;
+    return jwt.sign(key);
 }
 
 // ============================================================================
@@ -252,56 +194,11 @@ async function verifyJWTSignature(
     publicKey: string,
     algorithm: SigningAlgorithm
 ): Promise<boolean> {
-    try {
-        if (isClassicAlgorithm(algorithm)) {
-            return await verifyClassicJWTSignature(
-                message,
-                signatureB64url,
-                publicKey,
-                algorithm
-            );
-        }
-
-        if (isMLDSAAlgorithm(algorithm)) {
-            return verifyMLDSAJWTSignature(
-                message,
-                signatureB64url,
-                publicKey,
-                algorithm
-            );
-        }
-
-        if (isSLHDSAAlgorithm(algorithm)) {
-            return verifySLHDSAJWTSignature(
-                message,
-                signatureB64url,
-                publicKey,
-                algorithm
-            );
-        }
-
-        return false;
-    } catch {
-        return false;
-    }
-}
-
-/**
- * Verifies JWT signature using classic (jose) algorithm.
- */
-async function verifyClassicJWTSignature(
-    _message: string,
-    signatureB64url: string,
-    publicKeyPem: string,
-    algorithm: ClassicAlgorithm
-): Promise<boolean> {
-    // For classic algorithms, we need to verify the complete JWT
-    // Reconstruct the full JWT for jose verification
-    const key = await jose.importSPKI(publicKeyPem, algorithm);
+    const key = await jose.importSPKI(publicKey, algorithm);
 
     try {
         // Create a minimal verifier - jose handles the signature verification
-        const fullJwt = `${_message}.${signatureB64url}`;
+        const fullJwt = `${message}.${signatureB64url}`;
         await jose.jwtVerify(fullJwt, key, {
             algorithms: [algorithm],
         });
@@ -309,40 +206,6 @@ async function verifyClassicJWTSignature(
     } catch {
         return false;
     }
-}
-
-/**
- * Verifies JWT signature using ML-DSA (Dilithium).
- */
-function verifyMLDSAJWTSignature(
-    message: string,
-    signatureB64url: string,
-    publicKeyBase64: string,
-    algorithm: MLDSAAlgorithm
-): boolean {
-    const instance = ML_DSA_INSTANCES[algorithm];
-    const signatureBytes = Buffer.from(signatureB64url, 'base64url');
-    const publicKeyBytes = Buffer.from(publicKeyBase64, 'base64');
-    const messageBytes = Buffer.from(message, 'utf8');
-
-    return instance.verify(signatureBytes, messageBytes, publicKeyBytes);
-}
-
-/**
- * Verifies JWT signature using SLH-DSA (SPHINCS+).
- */
-function verifySLHDSAJWTSignature(
-    message: string,
-    signatureB64url: string,
-    publicKeyBase64: string,
-    _algorithm: SLHDSAAlgorithm
-): boolean {
-    const instance = SLH_DSA_INSTANCES['SLH-DSA-SHA2-192f'];
-    const signatureBytes = Buffer.from(signatureB64url, 'base64url');
-    const publicKeyBytes = Buffer.from(publicKeyBase64, 'base64');
-    const messageBytes = Buffer.from(message, 'utf8');
-
-    return instance.verify(signatureBytes, messageBytes, publicKeyBytes);
 }
 
 /**

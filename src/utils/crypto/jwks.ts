@@ -4,10 +4,7 @@
  */
 
 import * as jose from 'jose';
-
-import { isClassicAlgorithm } from '../../constants/crypto';
 import type { SigningAlgorithm } from '../../types/crypto';
-import {base64url} from "jose";
 
 // ============================================================================
 // JWKS EXPORT (for public key distribution)
@@ -15,11 +12,6 @@ import {base64url} from "jose";
 
 /**
  * Exports a public key to JWK format for JWKS endpoint.
- *
- * For classic algorithms, uses standard JWK format.
- * For post-quantum algorithms, uses emerging PQC JWK format:
- * - ML-DSA: kty="PQC", crv="ML-DSA-XX", pk=base64url(publicKey)
- * - SLH-DSA: kty="SPHINCS+", crv="SLH-DSA-SHA2-192f", pk=base64url(publicKey)
  *
  * @param publicKey - Public key to export
  * @param algorithm - Algorithm for this key
@@ -41,53 +33,14 @@ export async function exportToJWK(
     algorithm: SigningAlgorithm,
     kid: string
 ): Promise<jose.JWK> {
-    // Classic algorithms: standard JWK export
-    if (isClassicAlgorithm(algorithm)) {
-        const key = await jose.importSPKI(publicKey, algorithm);
-        const jwk = await jose.exportJWK(key);
-
-        return {
-            ...jwk,
-            kid,
-            alg: algorithm,
-            use: 'sig',
-        };
-    }
-
-    // ML-DSA algorithms: PQC JWK format
-    if (algorithm.startsWith('ML-DSA-')) {
-        const pkBase64url = Buffer.from(publicKey, 'base64').toString(
-            'base64url'
-        );
-
-        return {
-            kty: 'PQC',
-            crv: algorithm,
-            pub: pkBase64url,
-            alg: algorithm,
-            kid,
-            use: 'sig',
-        };
-    }
-
-    // SLH-DSA algorithms: SPHINCS+ JWK format
-    if (algorithm.startsWith('SLH-DSA-')) {
-        const pkBase64url = Buffer.from(publicKey, 'base64').toString(
-            'base64url'
-        );
-
-        return {
-            kty: 'SPHINCS+',
-            crv: algorithm,
-            pub: pkBase64url,
-            alg: algorithm,
-            kid,
-            use: 'sig',
-        };
-    }
-
-    // Fallback (should never reach here due to type safety)
-    throw new Error(`Unsupported algorithm for JWK export: ${algorithm}`);
+    const key = await jose.importSPKI(publicKey, algorithm);
+    const jwk = await jose.exportJWK(key);
+    return {
+        ...jwk,
+        kid,
+        alg: algorithm,
+        use: 'sig',
+    };
 }
 
 /**
@@ -133,9 +86,6 @@ export async function createJWKS(
 /**
  * Imports a JWK and returns the corresponding KeyLike object for jose.
  *
- * Only supports classic algorithms. Post-quantum keys must be handled
- * using the raw base64 format.
- *
  * @param jwk - JWK object to import
  * @returns KeyLike object for jose operations
  * @throws Error if algorithm is not supported or JWK is invalid
@@ -154,11 +104,6 @@ export async function importFromJWK(
 
     if (!alg) {
         throw new Error('JWK must have an "alg" property');
-    }
-
-    // Check for post-quantum algorithms
-    if (jwk.kty === 'PQC' || jwk.kty === 'SPHINCS+') {
-        return base64url.decode(jwk.pub!)
     }
 
     return jose.importJWK(jwk, alg);

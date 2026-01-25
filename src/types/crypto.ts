@@ -21,24 +21,7 @@
  *
  * @see https://nvlpubs.nist.gov/nistpubs/ir/2024/NIST.IR.8547.ipd.pdf
  */
-export type SigningAlgorithm =
-    | 'EdDSA'
-    | 'ES256'
-    | 'ES384'
-    | 'RS256'
-    | 'ML-DSA-44'
-    | 'ML-DSA-65'
-    | 'ML-DSA-87'
-    | 'SLH-DSA-SHA2-192f';
-
-/** Classic algorithms supported by jose library */
-export type ClassicAlgorithm = 'EdDSA' | 'ES256' | 'ES384' | 'RS256';
-
-/** Post-quantum lattice-based algorithms (FIPS 204) */
-export type MLDSAAlgorithm = 'ML-DSA-44' | 'ML-DSA-65' | 'ML-DSA-87';
-
-/** Post-quantum hash-based algorithms (FIPS 205) */
-export type SLHDSAAlgorithm = 'SLH-DSA-SHA2-192f';
+export type SigningAlgorithm = 'EdDSA' | 'ES256' | 'ES384' | 'RS256';
 
 // ============================================================================
 // KEY INTERFACES

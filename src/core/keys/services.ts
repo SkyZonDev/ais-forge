@@ -1,4 +1,6 @@
+import { randomBytes } from 'node:crypto';
 import type { JWK } from 'jose';
+import * as jose from 'jose';
 import { auditRepository } from '../../db/repository/audit.repository';
 import { keysRepository } from '../../db/repository/keys.repository';
 import { ApiError } from '../../utils/api/api-error';
@@ -7,7 +9,6 @@ import {
     createJWT,
     decryptPrivateKey,
     encryptPrivateKey,
-    generateKeyPair,
     type SigningAlgorithm,
 } from '../../utils/crypto';
 
@@ -100,6 +101,19 @@ interface KeyHealthStatus {
 // ============================================================================
 // KEY GENERATION
 // ============================================================================
+/**
+ * Generates a unique key identifier (kid) for JWKS.
+ *
+ * Format: YYYY-MM-XXXXXXXX (date prefix + random hex)
+ * Example: 2025-01-a3f9b2c1
+ *
+ * @returns Unique key identifier string
+ */
+export function generateKid(): string {
+    const datePrefix = new Date().toISOString().slice(0, 7);
+    const randomSuffix = randomBytes(4).toString('hex');
+    return `${datePrefix}-${randomSuffix}`;
+}
 
 /**
  * Generates a new signing key and stores it in the database.
@@ -118,11 +132,6 @@ interface KeyHealthStatus {
  * // Generate a new ES256 key valid for 90 days
  * const key = await generateSigningKey();
  *
- * // Generate a post-quantum key with custom validity
- * const pqKey = await generateSigningKey({
- *   algorithm: 'ML-DSA-65',
- *   validityDays: 180,
- * });
  * ```
  */
 export async function generateSigningKey(options: GenerateKeyOptions = {}) {
@@ -141,11 +150,16 @@ export async function generateSigningKey(options: GenerateKeyOptions = {}) {
     const masterKeyBuffer = Buffer.from(masterKey, 'base64');
 
     // Generate key pair
-    const keyPair = await generateKeyPair(algorithm, kid);
+    const { publicKey, privateKey } = await jose.generateKeyPair(algorithm, {
+        extractable: true,
+    });
+
+    const pemPrivateKey = await jose.exportPKCS8(privateKey);
+    const pemPublicKey = await jose.exportSPKI(publicKey);
 
     // Encrypt private key for storage
     const encryptedKeyPair = await encryptPrivateKey(
-        keyPair.privateKey,
+        pemPrivateKey,
         masterKeyBuffer
     );
 
@@ -155,10 +169,10 @@ export async function generateSigningKey(options: GenerateKeyOptions = {}) {
 
     // Store in database
     const signingKey = await keysRepository.create({
-        kid: keyPair.kid,
-        algorithm: keyPair.algorithm,
+        kid: kid ?? generateKid(),
+        algorithm,
         privateKeyEncrypted: encryptedKeyPair,
-        publicKey: keyPair.publicKey,
+        publicKey: pemPublicKey,
         expiresAt,
     });
 

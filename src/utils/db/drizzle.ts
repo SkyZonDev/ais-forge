@@ -4,7 +4,7 @@ import { config } from '../../config';
 import * as schema from '../../db/schema';
 
 const pool = new Pool({
-    connectionString: config.db.pgUrl,
+    connectionString: config.database.url,
     max: 10,
     min: 2,
     idleTimeoutMillis: 30000,

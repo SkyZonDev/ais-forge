@@ -4,31 +4,22 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="feat(auth): implement API response handling and authentication routes">
-      <change afterPath="$PROJECT_DIR$/scripts/master-key.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.env.example" beforeDir="false" afterPath="$PROJECT_DIR$/.env.example" afterDir="false" />
+    <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/config.development.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/config.example.yaml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/scripts/main.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/config/loader.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/utils/scheduler/key-rotation.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/SECURITY.md" beforeDir="false" afterPath="$PROJECT_DIR$/SECURITY.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/constants/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/constants/crypto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/auth/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/auth/services.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/keys/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/keys/services.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/auth/auth-methods.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/session.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/session.repository.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/scripts/master-key.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/api/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/config/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/db/schema/enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/enum.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/audit.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/audit.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/auth-methods.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/auth-methods.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/crypto.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/crypto.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/jwks.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/jwt.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/keys.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/signing.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/signing.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/ip.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/ip.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/utils/db/drizzle.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/db/drizzle.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -103,6 +94,7 @@
 }</component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\skyzo\WebstormProjects\ais-forge" />
       <recent name="D:\workstation\dev\ais-forge\src" />
       <recent name="D:\workstation\dev\ais-forge\src\utils\api" />
     </key>
@@ -126,7 +118,7 @@
       <workItem from="1768056685202" duration="23619000" />
       <workItem from="1769357577515" duration="302000" />
       <workItem from="1769358784396" duration="1072000" />
-      <workItem from="1769361004602" duration="6682000" />
+      <workItem from="1769361004602" duration="12853000" />
     </task>
     <servers />
   </component>
@@ -136,10 +128,6 @@
   <component name="XDebuggerManager">
     <breakpoint-manager>
       <breakpoints>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/app.ts</url>
-          <option name="timeStamp" value="26" />
-        </line-breakpoint>
         <line-breakpoint enabled="true" type="javascript">
           <url>file://$PROJECT_DIR$/src/types/pagination.ts</url>
           <line>49</line>

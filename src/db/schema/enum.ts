@@ -38,6 +38,8 @@ export const signingAlgorithm = [
     'EdDSA', // Ed25519 - Fast, modern
     'ES384', // ECDSA P-384 - Industry standard
     'ES256', // ECDSA P-256 - Widely supported
+    'ES512',
+
     // Legacy
     'RS256', // RSA - Compatibility (<2030)
 ] as const;

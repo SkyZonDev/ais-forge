@@ -5,14 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/core/token/service.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/controllers.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/route.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/route.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/v1/auth/schema.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/v1/auth/schema.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/app.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/app.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/auth/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/auth/services.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/refresh-token.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/crypto/password.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/crypto/password.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -44,6 +39,9 @@
     &quot;accountId&quot;: &quot;dfd224f4-e82c-4db5-b741-d75453d41d01&quot;
   }
 }</component>
+  <component name="KubernetesApiProvider"><![CDATA[{
+  "isMigrated": true
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -112,7 +110,7 @@
       <workItem from="1769357577515" duration="302000" />
       <workItem from="1769358784396" duration="1072000" />
       <workItem from="1769361004602" duration="12853000" />
-      <workItem from="1769428463610" duration="10214000" />
+      <workItem from="1769428463610" duration="11466000" />
     </task>
     <servers />
   </component>

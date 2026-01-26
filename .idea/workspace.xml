@@ -5,21 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/config.development.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/config.example.yaml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/scripts/main.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/config/loader.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/utils/scheduler/key-rotation.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pnpm-lock.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pnpm-lock.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/scripts/master-key.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/api/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/api/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/config/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/config/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/enum.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/enum.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/index.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/utils/db/drizzle.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/utils/db/drizzle.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -119,6 +106,7 @@
       <workItem from="1769357577515" duration="302000" />
       <workItem from="1769358784396" duration="1072000" />
       <workItem from="1769361004602" duration="12853000" />
+      <workItem from="1769428463610" duration="1563000" />
     </task>
     <servers />
   </component>
@@ -132,12 +120,6 @@
           <url>file://$PROJECT_DIR$/src/types/pagination.ts</url>
           <line>49</line>
           <option name="timeStamp" value="38" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/src/core/keys/services.ts</url>
-          <line>240</line>
-          <properties lambdaOrdinal="-1" />
-          <option name="timeStamp" value="43" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

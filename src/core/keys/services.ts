@@ -257,7 +257,7 @@ export async function rotateSigningKey(options: RotateKeyOptions = {}) {
 
     // Generate new key (use same algorithm if not specified)
     const newKey = await generateSigningKey({
-        algorithm: algorithm ?? currentKey.algorithm,
+        algorithm: (algorithm ?? currentKey.algorithm) as SigningAlgorithm,
         validityDays,
     });
 

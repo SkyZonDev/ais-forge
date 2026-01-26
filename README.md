@@ -180,7 +180,7 @@ AIS Forge is **not** for:
 - ❌ Consumer-facing identity providers
 - ❌ Social login or SSO platforms
 - ❌ Replacing Google/GitHub login
-- ❌ Browser-based redirect flows
+- ❌ Browser[template.md](../../Documents/WORKSTATION/DPS/dps-solution/.gitlab/merge_request_templates/template.md)-based redirect flows
 
 ---
 

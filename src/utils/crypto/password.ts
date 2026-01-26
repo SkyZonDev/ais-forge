@@ -3,7 +3,16 @@
  * @module utils/crypto/password
  */
 
+import { createHash } from 'node:crypto';
 import { hash, verify } from '@node-rs/argon2';
+
+/**
+ * Hash a token with SHA-256 (deterministic)
+ * Use this for tokens, NOT passwords!
+ */
+export function hashToken(token: string): string {
+    return createHash('sha256').update(token).digest('hex');
+}
 
 // ============================================================================
 // PASSWORD HASHING (Argon2id)

@@ -34,3 +34,13 @@ export async function logout(req: FastifyRequest, res: FastifyReply) {
         return ApiResponse.handleError(res, e);
     }
 }
+
+export async function refresh(req: FastifyRequest, res: FastifyReply) {
+    try {
+        const { refreshToken } = schema.refresh.body.parse(req.body);
+        const data = await authServices.refreshToken(refreshToken);
+        return ApiResponse.success(res, data);
+    } catch (e) {
+        return ApiResponse.handleError(res, e);
+    }
+}

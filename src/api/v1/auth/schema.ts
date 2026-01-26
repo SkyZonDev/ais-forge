@@ -54,4 +54,9 @@ export const schema = {
                 .trim(),
         }),
     },
+    refresh: {
+        body: z.object({
+            refreshToken: z.string(),
+        }),
+    },
 };

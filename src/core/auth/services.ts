@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { config } from '../../config';
 import { auditRepository } from '../../db/repository/audit.repository';
 import { authMethodsRepository } from '../../db/repository/auth/auth-methods.repository';
 import { identitiesRepository } from '../../db/repository/identities.repository';
@@ -6,6 +7,7 @@ import { refreshTokenRepository } from '../../db/repository/refresh-token.reposi
 import { sessionsRepository } from '../../db/repository/session.repository';
 import { ApiError } from '../../utils/api/api-error';
 import { hashPassword, verifyPassword } from '../../utils/crypto';
+import { hashToken } from '../../utils/crypto/password';
 import { signToken } from '../keys/services';
 
 interface SigninData {
@@ -166,10 +168,8 @@ export async function finalize({
     const refreshToken = crypto.randomBytes(32).toString('base64url');
     const tokenFamilyId = crypto.randomUUID();
 
-    const [sessionTokenHash, refreshTokenHash] = await Promise.all([
-        hashPassword(sessionToken),
-        hashPassword(refreshToken),
-    ]);
+    const sessionTokenHash = hashToken(sessionToken);
+    const refreshTokenHash = hashToken(refreshToken);
 
     const refreshTtl = rememberMe ? 15 * 24 * 60 * 60 : 2 * 24 * 60 * 60;
     const expiresAt = new Date(Date.now() + refreshTtl);
@@ -195,10 +195,10 @@ export async function finalize({
             ...(email && { email }),
         },
         {
-            issuer: 'ais-forge',
+            issuer: config.security.jwt.issuer,
             algorithm: 'ES256',
-            audience: 'my-api',
-            expiresIn: '15m',
+            audience: config.security.jwt.audience,
+            expiresIn: config.security.jwt.accessTokenTTL,
         }
     );
 
@@ -228,5 +228,74 @@ export async function finalize({
         access_token: accessToken,
         refresh_token: refreshToken,
         expires_in: refreshTtl,
+    };
+}
+
+/**
+ * Refreshes an access token using a refresh token.
+ *
+ * Strategy: No automatic rotation - the refresh token is reused multiple times
+ * until it expires or is manually revoked. This is simpler and suitable for
+ * most use cases.
+ *
+ * For rotation strategy (more secure), see refreshTokenWithRotation below.
+ */
+export async function refreshToken(plainRefreshToken: string) {
+    const refreshTokenHash = hashToken(plainRefreshToken);
+    console.log(refreshTokenHash);
+
+    const token =
+        await refreshTokenRepository.findActiveByTokenHash(refreshTokenHash);
+    if (!token) {
+        throw new ApiError(
+            'Invalid or expired refresh token',
+            401,
+            'INVALID_REFRESH_TOKEN'
+        );
+    }
+
+    // Verify session exists and is valid
+    if (!token.sessionId) {
+        throw new ApiError(
+            'Refresh token not associated with session',
+            400,
+            'INVALID_TOKEN_TYPE'
+        );
+    }
+
+    const session = await sessionsRepository.findById(token.sessionId);
+    if (!session) {
+        await refreshTokenRepository.deleteById(token.id);
+        throw new ApiError('Session not found', 401, 'SESSION_NOT_FOUND');
+    }
+
+    await sessionsRepository.updateLastActivityAt(session.id);
+
+    // Get identity for token claims
+    const identity = await identitiesRepository.findById(token.identityId);
+    if (!identity) {
+        throw new ApiError('Identity not found', 401, 'IDENTITY_NOT_FOUND');
+    }
+
+    const accessToken = await signToken(
+        {
+            sub: token.identityId,
+            sid: token.sessionId,
+            scope: '',
+            name: identity.displayName,
+            amr: ['pwd'], // or get from session
+            ...(identity.email && { email: identity.email }),
+        },
+        {
+            issuer: config.security.jwt.issuer,
+            algorithm: 'ES256',
+            audience: config.security.jwt.audience,
+            expiresIn: config.security.jwt.accessTokenTTL,
+        }
+    );
+
+    return {
+        accessToken,
+        expiresIn: config.security.jwt.accessTokenTTL,
     };
 }

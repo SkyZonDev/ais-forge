@@ -315,14 +315,17 @@ export const refreshTokenRepository = {
     async findActiveById(id: string): Promise<RefreshToken | null> {
         const now = new Date();
 
-        const token = await db.query.refreshTokens.findFirst({
-            where: and(
-                eq(schema.refreshTokens.id, id),
-                isNull(schema.refreshTokens.revokedAt),
-                isNull(schema.refreshTokens.usedAt),
-                gt(schema.refreshTokens.expiresAt, now)
-            ),
-        });
+        const [token] = await db
+            .select()
+            .from(schema.refreshTokens)
+            .where(
+                and(
+                    eq(schema.refreshTokens.id, id),
+                    isNull(schema.refreshTokens.revokedAt),
+                    isNull(schema.refreshTokens.usedAt),
+                    lt(schema.refreshTokens.expiresAt, now)
+                )
+            );
 
         return token ?? null;
     },
@@ -392,15 +395,19 @@ export const refreshTokenRepository = {
         }
 
         // Cache miss or invalid - query database
-        const token = await db.query.refreshTokens.findFirst({
-            where: and(
-                eq(schema.refreshTokens.tokenHash, tokenHash),
-                isNull(schema.refreshTokens.revokedAt),
-                isNull(schema.refreshTokens.usedAt),
-                gt(schema.refreshTokens.expiresAt, now)
-            ),
-        });
+        const [token] = await db
+            .select()
+            .from(schema.refreshTokens)
+            .where(
+                and(
+                    eq(schema.refreshTokens.tokenHash, tokenHash),
+                    isNull(schema.refreshTokens.revokedAt),
+                    isNull(schema.refreshTokens.usedAt),
+                    lt(schema.refreshTokens.expiresAt, now)
+                )
+            );
 
+        console.log(token);
         if (token) {
             await _cacheToken(token);
         }

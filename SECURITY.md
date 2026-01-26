@@ -39,7 +39,7 @@ AIS Forge implements multiple layers of security:
 - **Token binding** to prevent token theft
 
 ### Data Protection
-- **Bcrypt password hashing** with configurable cost factor
+- **Argon2id password hashing** with configurable cost factor
 - **No plaintext secrets** stored in the database
 - **Prepared statements** to prevent SQL injection
 - **Input validation** on all endpoints

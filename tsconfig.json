@@ -4,13 +4,14 @@
         "module": "esnext",
         "target": "esnext",
         "moduleResolution": "bundler",
+        "resolveJsonModule": true,
         "lib": ["esnext"],
         "types": ["node"],
         "sourceMap": true,
         "declaration": true,
         "declarationMap": true,
         "noUncheckedIndexedAccess": true,
-        "exactOptionalPropertyTypes": true,
+        "exactOptionalPropertyTypes": false,
         "strict": true,
         "jsx": "react-jsx",
         "verbatimModuleSyntax": true,
@@ -19,5 +20,6 @@
         "moduleDetection": "force",
         "skipLibCheck": true
     },
-    "include": ["src/**/*"]
+    "include": ["src/**/*"],
+    "exclude": ["**/dist/**", "**/node_modules/**"]
 }

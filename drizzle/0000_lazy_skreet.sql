@@ -235,10 +235,10 @@ CREATE INDEX "auth_method_revoked_idx" ON "auth_methods" USING btree ("revoked_a
 CREATE INDEX "auth_method_expires_idx" ON "auth_methods" USING btree ("expires_at") WHERE "auth_methods"."expires_at" IS NOT NULL AND "auth_methods"."revoked_at" IS NULL;--> statement-breakpoint
 CREATE UNIQUE INDEX "refresh_token_hash_idx" ON "refresh_tokens" USING btree ("token_hash");--> statement-breakpoint
 CREATE INDEX "refresh_token_family_active_idx" ON "refresh_tokens" USING btree ("token_family_id") WHERE "refresh_tokens"."revoked_at" IS NULL;--> statement-breakpoint
-CREATE INDEX "refresh_token_identity_valid_idx" ON "refresh_tokens" USING btree ("identity_id","expires_at") WHERE "refresh_tokens"."revoked_at" IS NULL AND "refresh_tokens"."expires_at" > NOW();--> statement-breakpoint
+CREATE INDEX "refresh_token_identity_valid_idx" ON "refresh_tokens" USING btree ("identity_id","expires_at") WHERE "refresh_tokens"."revoked_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "refresh_token_expires_idx" ON "refresh_tokens" USING btree ("expires_at") WHERE "refresh_tokens"."revoked_at" IS NULL;--> statement-breakpoint
 CREATE UNIQUE INDEX "session_token_hash_idx" ON "sessions" USING btree ("session_token_hash");--> statement-breakpoint
-CREATE INDEX "session_identity_active_idx" ON "sessions" USING btree ("identity_id") WHERE "sessions"."revoked_at" IS NULL AND "sessions"."expires_at" > NOW();--> statement-breakpoint
+CREATE INDEX "session_identity_active_idx" ON "sessions" USING btree ("identity_id") WHERE "sessions"."revoked_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "session_token_family_idx" ON "sessions" USING btree ("token_family_id");--> statement-breakpoint
 CREATE INDEX "session_org_idx" ON "sessions" USING btree ("organization_id");--> statement-breakpoint
 CREATE INDEX "session_expires_idx" ON "sessions" USING btree ("expires_at") WHERE "sessions"."revoked_at" IS NULL;--> statement-breakpoint
@@ -249,7 +249,7 @@ CREATE INDEX "identity_deleted_at_idx" ON "identities" USING btree ("deleted_at"
 CREATE INDEX "org_active_slug_idx" ON "organizations" USING btree ("slug") WHERE "organizations"."deleted_at" IS NULL;--> statement-breakpoint
 CREATE INDEX "org_deleted_at_idx" ON "organizations" USING btree ("deleted_at") WHERE "organizations"."deleted_at" IS NOT NULL;--> statement-breakpoint
 CREATE UNIQUE INDEX "rate_limit_key_window_unique_idx" ON "rate_limits" USING btree ("key","window_start");--> statement-breakpoint
-CREATE INDEX "rate_limit_blocked_idx" ON "rate_limits" USING btree ("blocked_until") WHERE "rate_limits"."blocked_until" IS NOT NULL AND "rate_limits"."blocked_until" > NOW();--> statement-breakpoint
+CREATE INDEX "rate_limit_blocked_idx" ON "rate_limits" USING btree ("blocked_until") WHERE "rate_limits"."blocked_until" IS NOT NULL;--> statement-breakpoint
 CREATE INDEX "rate_limit_window_start_idx" ON "rate_limits" USING btree ("window_start");--> statement-breakpoint
 CREATE UNIQUE INDEX "auth_method_permission_unique_idx" ON "auth_method_permissions" USING btree ("auth_method_id","permission_id");--> statement-breakpoint
 CREATE INDEX "auth_method_permission_method_idx" ON "auth_method_permissions" USING btree ("auth_method_id");--> statement-breakpoint

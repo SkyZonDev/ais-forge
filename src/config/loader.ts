@@ -37,6 +37,10 @@ const DatabaseConfigSchema = z.object({
     ssl: z.boolean().default(false),
 });
 
+const RedisConfigSchema = z.object({
+    url: z.string().min(1),
+});
+
 const SecurityConfigSchema = z.object({
     masterEncryptionKey: z.string().min(1),
     jwt: z.object({
@@ -123,6 +127,7 @@ const MetricsConfigSchema = z.object({
 const ConfigSchema = z.object({
     server: ServerConfigSchema,
     database: DatabaseConfigSchema,
+    redis: RedisConfigSchema,
     security: SecurityConfigSchema,
     keyRotation: KeyRotationConfigSchema,
     logging: LoggingConfigSchema,
@@ -217,16 +222,59 @@ export class ConfigLoader {
     private loadConfigFile(path: string): Partial<AppConfig> {
         const content = readFileSync(path, 'utf-8');
 
+        let parsed: Partial<AppConfig>;
         if (
             path.endsWith('.yaml') ||
             (path.endsWith('.yml') && !path.includes('example'))
         ) {
-            return parseYaml(content) as Partial<AppConfig>;
+            parsed = parseYaml(content) as Partial<AppConfig>;
         } else if (path.endsWith('.json')) {
-            return JSON.parse(content) as Partial<AppConfig>;
+            parsed = JSON.parse(content) as Partial<AppConfig>;
+        } else {
+            throw new Error(`Unsupported config file format: ${path}`);
         }
 
-        throw new Error(`Unsupported config file format: ${path}`);
+        // Interpolate environment variables
+        return this.interpolateEnvVars(parsed);
+    }
+
+    /**
+     * Recursively interpolate environment variables in config object
+     * Replaces ${VAR_NAME} with process.env.VAR_NAME
+     */
+    private interpolateEnvVars<T>(obj: T): T {
+        if (typeof obj === 'string') {
+            // Replace ${VAR_NAME} or $VAR_NAME with environment variable
+            return obj.replace(
+                /\$\{([^}]+)\}|\$([A-Z_][A-Z0-9_]*)/g,
+                (match, varName1, varName2) => {
+                    const varName = varName1 || varName2;
+                    const value = process.env[varName];
+                    if (value === undefined) {
+                        console.warn(
+                            `Environment variable ${varName} not found, keeping placeholder`
+                        );
+                        return match;
+                    }
+                    return value;
+                }
+            ) as T;
+        }
+
+        if (Array.isArray(obj)) {
+            return obj.map((item) => this.interpolateEnvVars(item)) as T;
+        }
+
+        if (obj !== null && typeof obj === 'object') {
+            const result = {} as T;
+            for (const [key, value] of Object.entries(obj)) {
+                (result as Record<string, unknown>)[key] =
+                    this.interpolateEnvVars(value);
+            }
+            return result;
+        }
+
+        return obj;
     }
 
     /**
@@ -271,6 +319,9 @@ export class ConfigLoader {
                     env.DATABASE_SSL === 'true'
                         ? true
                         : (fileConfig.database?.ssl ?? false),
+            },
+            redis: {
+                url: env.REDIS_URL ?? fileConfig.redis?.url ?? '',
             },
             security: {
                 masterEncryptionKey:

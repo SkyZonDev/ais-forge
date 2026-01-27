@@ -1,0 +1,227 @@
+# ============================================================================
+# AIS Forge - Docker Compose Configuration
+# ============================================================================
+# Multi-environment orchestration for local development and testing
+#
+# Usage:
+#   Development:  docker compose up
+#   Preview:      docker compose --profile preview up
+#   Production:   docker compose --profile production up
+#   Full stack:   docker compose --profile full up
+
+version: '3.9'
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+    ais-forge-network:
+        driver: bridge
+        ipam:
+            config:
+                - subnet: 172.10.0.0/16
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+    postgres-data:
+        driver: local
+    redis-data:
+        driver: local
+    pnpm-store:
+        driver: local
+
+# ============================================================================
+# Services
+# ============================================================================
+services:
+    # --------------------------------------------------------------------------
+    # PostgreSQL Database
+    # --------------------------------------------------------------------------
+    postgres:
+        image: postgres:18-alpine
+        container_name: ais-forge-postgres
+        restart: unless-stopped
+        environment:
+            POSTGRES_DB: ${DB_NAME:-aisforge}
+            POSTGRES_USER: ${DB_USER:-aisforge}
+            POSTGRES_PASSWORD: ${DB_PASSWORD:-password}
+            POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+        ports:
+            - "${DB_PORT:-5432}:5432"
+        volumes:
+            - postgres-data:/var/lib/postgresql
+        networks:
+            - ais-forge-network
+        healthcheck:
+            test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-aisforge}"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 10s
+
+    # --------------------------------------------------------------------------
+    # Redis Cache
+    # --------------------------------------------------------------------------
+    redis:
+        image: redis:7-alpine
+        container_name: ais-forge-redis
+        restart: unless-stopped
+        command: >
+            redis-server
+            --appendonly yes
+            --requirepass ${REDIS_PASSWORD:-redispassword}
+            --maxmemory 256mb
+            --maxmemory-policy allkeys-lru
+        ports:
+            - "${REDIS_PORT:-6379}:6379"
+        volumes:
+            - redis-data:/data
+        networks:
+            - ais-forge-network
+        healthcheck:
+            test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+            interval: 10s
+            timeout: 3s
+            retries: 5
+            start_period: 5s
+
+    # --------------------------------------------------------------------------
+    # Development Environment
+    # --------------------------------------------------------------------------
+    app-dev:
+        build:
+            context: .
+            target: development
+            dockerfile: Dockerfile
+            cache_from:
+                - type=local,src=/tmp/.buildx-cache
+            args:
+                NODE_VERSION: 20
+                PNPM_VERSION: 10.27.0
+        container_name: ais-forge-dev
+        restart: unless-stopped
+        profiles: ["dev", "development"]
+        environment:
+            NODE_ENV: development
+            DATABASE_URL: postgresql://${DB_USER:-aisforge}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-aisforge}
+            REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+            MASTER_ENCRYPTION_KEY: ${MASTER_ENCRYPTION_KEY:-dev-key-change-in-production}
+            LOG_LEVEL: debug
+        ports:
+            - "3000:3000"
+            - "9090:9090"
+        volumes:
+            # Mount source code for hot reload
+            - .:/app
+            - /app/node_modules
+            - pnpm-store:/pnpm/store
+        networks:
+            - ais-forge-network
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        command: pnpm run dev
+
+    # --------------------------------------------------------------------------
+    # Preview/Staging Environment
+    # --------------------------------------------------------------------------
+    app-preview:
+        build:
+            context: .
+            target: preview
+            dockerfile: Dockerfile
+            cache_from:
+                - type=local,src=/tmp/.buildx-cache
+        container_name: ais-forge-preview
+        restart: unless-stopped
+        profiles: ["preview", "staging"]
+        environment:
+            NODE_ENV: production
+            DATABASE_URL: postgresql://${DB_USER:-aisforge}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-aisforge}
+            REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+            MASTER_ENCRYPTION_KEY: ${MASTER_ENCRYPTION_KEY:-preview-key-change-in-production}
+            LOG_LEVEL: info
+            IS_PREVIEW: "true"
+        ports:
+            - "3001:3000"
+            - "9091:9090"
+        networks:
+            - ais-forge-network
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health',(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 40s
+
+    # --------------------------------------------------------------------------
+    # Production Environment
+    # --------------------------------------------------------------------------
+    app-prod:
+        build:
+            context: .
+            target: production
+            dockerfile: Dockerfile
+            cache_from:
+                - type=local,src=/tmp/.buildx-cache
+        container_name: ais-forge-prod
+        restart: always
+        profiles: ["prod", "production"]
+        environment:
+            NODE_ENV: production
+            DATABASE_URL: postgresql://${DB_USER:-aisforge}:${DB_PASSWORD:-password}@postgres:5432/${DB_NAME:-aisforge}
+            REDIS_URL: redis://:${REDIS_PASSWORD:-redispassword}@redis:6379
+            MASTER_ENCRYPTION_KEY: ${MASTER_ENCRYPTION_KEY}
+            LOG_LEVEL: ${LOG_LEVEL:-info}
+        ports:
+            - "3002:3000"
+            - "9092:9090"
+        networks:
+            - ais-forge-network
+        depends_on:
+            postgres:
+                condition: service_healthy
+            redis:
+                condition: service_healthy
+        healthcheck:
+            test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health',(r)=>{process.exit(r.statusCode===200?0:1)}).on('error',()=>process.exit(1))"]
+            interval: 30s
+            timeout: 5s
+            retries: 3
+            start_period: 40s
+        deploy:
+            resources:
+                limits:
+                    cpus: '2'
+                    memory: 2G
+                reservations:
+                    cpus: '0.5'
+                    memory: 512M
+
+    # --------------------------------------------------------------------------
+    # Database Migrations Runner (optional)
+    # --------------------------------------------------------------------------
+    migrations:
+        build:
+            context: .
+            target: builder
+            dockerfile: Dockerfile
+        container_name: ais-forge-migrations
+        profiles: ["migrations"]
+        env_file:
+            - '.env'
+        networks:
+            - ais-forge-network
+        depends_on:
+            postgres:
+                condition: service_healthy
+        command: pnpm run db:migrate

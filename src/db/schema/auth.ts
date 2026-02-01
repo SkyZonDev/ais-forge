@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { and, gt, isNotNull, isNull, ne, or, sql } from 'drizzle-orm';
 import {
     type AnyPgColumn,
     check,
@@ -52,27 +52,33 @@ export const authMethods = pgTable(
         // Lookup active methods by identity
         index('auth_method_identity_active_idx')
             .on(table.identityId, table.type)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
 
         // Index by organization for admin
-        index('auth_method_org_idx').on(table.organizationId),
+        index('auth_method_org_idx')
+            .on(table.organizationId)
+            .where(isNotNull(table.organizationId)),
 
         // Cleanup revoked methods
         index('auth_method_revoked_idx')
             .on(table.revokedAt)
-            .where(sql`${table.revokedAt} IS NOT NULL`),
+            .where(isNotNull(table.revokedAt)),
 
         // Index for expiration (automatic cleanup)
         index('auth_method_expires_idx')
             .on(table.expiresAt)
-            .where(
-                sql`${table.expiresAt} IS NOT NULL AND ${table.revokedAt} IS NULL`
-            ),
+            .where(and(isNotNull(table.expiresAt), isNull(table.revokedAt))!),
 
         // Constraint: expiration must be in the future at creation
         check(
             'auth_method_expires_future',
-            sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
+            or(isNull(table.expiresAt), gt(table.expiresAt, table.createdAt))!
+        ),
+
+        // Constraint: password type must NOT have organization scope
+        check(
+            'auth_method_password_no_org',
+            or(sql`${table.type} != 'password'`, isNull(table.organizationId))!
         ),
     ]
 );
@@ -121,7 +127,12 @@ export const sessions = pgTable(
         // Active sessions by identity
         index('session_identity_active_idx')
             .on(table.identityId)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
+
+        // Active sessions by identity + org
+        index('session_identity_org_active_idx')
+            .on(table.identityId, table.organizationId)
+            .where(isNull(table.revokedAt)),
 
         // Theft detection by family
         index('session_token_family_idx').on(table.tokenFamilyId),
@@ -132,13 +143,10 @@ export const sessions = pgTable(
         // Cleanup expired sessions
         index('session_expires_idx')
             .on(table.expiresAt)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
 
         // Constraint: expiration must be in the future
-        check(
-            'session_expires_future',
-            sql`${table.expiresAt} > ${table.createdAt}`
-        ),
+        check('session_expires_future', gt(table.expiresAt, table.createdAt)),
     ]
 );
 
@@ -187,22 +195,27 @@ export const refreshTokens = pgTable(
         // Theft detection: active tokens by family
         index('refresh_token_family_active_idx')
             .on(table.tokenFamilyId)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
 
         // Valid tokens by identity (for listing)
         index('refresh_token_identity_valid_idx')
             .on(table.identityId, table.expiresAt)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
+
+        // Valid tokens by identity + org
+        index('refresh_token_identity_org_valid_idx')
+            .on(table.identityId, table.organizationId)
+            .where(isNull(table.revokedAt)),
 
         // Cleanup expired tokens
         index('refresh_token_expires_idx')
             .on(table.expiresAt)
-            .where(sql`${table.revokedAt} IS NULL`),
+            .where(isNull(table.revokedAt)),
 
         // Constraint: expiration must be in the future
         check(
             'refresh_token_expires_future',
-            sql`${table.expiresAt} > ${table.createdAt}`
+            gt(table.expiresAt, table.createdAt)
         ),
 
         // Constraint: session XOR authMethod (not both)

@@ -5,6 +5,7 @@ import type {
     Organization,
     UpdateOrganizationInput,
 } from '../../types/organizations';
+import { ApiError } from '../../utils/api/api-error';
 import { db } from '../../utils/db';
 import * as schema from '../schema';
 import {
@@ -26,6 +27,7 @@ export const organizationsRepository = {
      * @param input.slug - Unique DNS-safe identifier (lowercase alphanumeric with hyphens)
      * @param input.name - Display name of the organization
      * @param input.metadata - Optional extensible metadata object
+     * @param identityId - Id of user who create organization
      * @returns The newly created organization record
      * @throws {Error} If slug format is invalid or slug already exists
      *
@@ -38,17 +40,47 @@ export const organizationsRepository = {
      * });
      * ```
      */
-    async create(input: CreateOrganizationInput): Promise<Organization | null> {
-        const [organization] = await db
-            .insert(schema.organizations)
-            .values({
-                slug: input.slug,
-                name: input.name,
-                metadata: input.metadata ?? {},
-            })
-            .returning();
+    async create(
+        input: CreateOrganizationInput,
+        identityId: string
+    ): Promise<Organization | null> {
+        const result = await db.transaction(async (tx) => {
+            const [organization] = await tx
+                .insert(schema.organizations)
+                .values({
+                    slug: input.slug,
+                    name: input.name,
+                    metadata: input.metadata ?? {},
+                })
+                .returning();
 
-        return organization ?? null;
+            if (!organization) {
+                throw new ApiError(
+                    'Error during organization creation',
+                    401,
+                    'ERROR_ORGANIZATION_CREATION'
+                );
+            }
+
+            const [member] = await tx
+                .insert(schema.identityOrganizations)
+                .values({
+                    identityId,
+                    organizationId: organization.id,
+                })
+                .returning();
+            if (!member) {
+                throw new ApiError(
+                    'Error during adding identity in org',
+                    401,
+                    'ERROR_ADD_IDENTITY_ORGANIZATION'
+                );
+            }
+
+            return organization;
+        });
+
+        return result ?? null;
     },
 
     /**
@@ -410,5 +442,97 @@ export const organizationsRepository = {
             .where(and(...conditions));
 
         return (result?.count ?? 0) === 0;
+    },
+
+    /**
+     * Retrieves the most appropriate organization for an identity.
+     *
+     * Priority order:
+     * 1. The primary organization (if set and active)
+     * 2. The most recently joined organization (if multiple exist)
+     * 3. The only organization (if there's just one)
+     * 4. The first organization found (fallback)
+     *
+     * @param identityId - The UUID of the identity
+     * @returns The organization or null if the identity has no organizations
+     *
+     * @example
+     * ```typescript
+     * const org = await identitiesRepository.getPreferredOrganization('identity-uuid');
+     * if (org) {
+     *   console.log(`Using organization: ${org.name}`);
+     * }
+     * ```
+     */
+    async getPreferredOrganization(
+        identityId: string
+    ): Promise<Organization | null> {
+        // First, try to get the primary organization
+        const [primaryOrg] = await db
+            .select({
+                id: schema.organizations.id,
+                slug: schema.organizations.slug,
+                name: schema.organizations.name,
+                createdAt: schema.organizations.createdAt,
+                updatedAt: schema.organizations.updatedAt,
+                deletedAt: schema.organizations.deletedAt,
+                metadata: schema.organizations.metadata,
+            })
+            .from(schema.identityOrganizations)
+            .innerJoin(
+                schema.organizations,
+                eq(
+                    schema.identityOrganizations.organizationId,
+                    schema.organizations.id
+                )
+            )
+            .where(
+                and(
+                    eq(schema.identityOrganizations.identityId, identityId),
+                    eq(schema.identityOrganizations.isPrimary, true),
+                    isNull(schema.identityOrganizations.leftAt),
+                    isNull(schema.organizations.deletedAt)
+                )
+            )
+            .limit(1);
+
+        if (primaryOrg) {
+            return primaryOrg;
+        }
+
+        // If no primary org, get all active organizations
+        const [orgs] = await db
+            .select({
+                id: schema.organizations.id,
+                slug: schema.organizations.slug,
+                name: schema.organizations.name,
+                createdAt: schema.organizations.createdAt,
+                updatedAt: schema.organizations.updatedAt,
+                deletedAt: schema.organizations.deletedAt,
+                metadata: schema.organizations.metadata,
+                joinedAt: schema.identityOrganizations.joinedAt,
+            })
+            .from(schema.identityOrganizations)
+            .innerJoin(
+                schema.organizations,
+                eq(
+                    schema.identityOrganizations.organizationId,
+                    schema.organizations.id
+                )
+            )
+            .where(
+                and(
+                    eq(schema.identityOrganizations.identityId, identityId),
+                    isNull(schema.identityOrganizations.leftAt),
+                    isNull(schema.organizations.deletedAt)
+                )
+            )
+            .orderBy(desc(schema.identityOrganizations.joinedAt));
+
+        if (!orgs) return null;
+
+        // Return the most recently joined organization (first in the sorted list)
+        const { joinedAt, ...org } = orgs;
+        return org;
     },
 };

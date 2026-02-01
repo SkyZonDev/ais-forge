@@ -1,4 +1,4 @@
-import { sql } from 'drizzle-orm';
+import { gt, isNotNull, isNull, or, sql } from 'drizzle-orm';
 import {
     boolean,
     check,
@@ -51,7 +51,7 @@ export const permissions = pgTable(
         // Unique key per organization
         uniqueIndex('permission_org_key_unique_idx')
             .on(table.organizationId, table.key)
-            .where(sql`${table.deletedAt} IS NULL`),
+            .where(isNull(table.deletedAt)),
 
         // Search by components (for wildcard matching)
         index('permission_org_components_idx')
@@ -61,12 +61,12 @@ export const permissions = pgTable(
                 table.resource,
                 table.action
             )
-            .where(sql`${table.deletedAt} IS NULL`),
+            .where(isNull(table.deletedAt)),
 
         // Cleanup
         index('permission_deleted_at_idx')
             .on(table.deletedAt)
-            .where(sql`${table.deletedAt} IS NOT NULL`),
+            .where(isNotNull(table.deletedAt)),
 
         // Constraint: key = namespace:resource:action
         check(
@@ -115,12 +115,12 @@ export const roles = pgTable(
         // Unique slug per organization
         uniqueIndex('role_org_slug_unique_idx')
             .on(table.organizationId, table.slug)
-            .where(sql`${table.deletedAt} IS NULL`),
+            .where(isNull(table.deletedAt)),
 
         // Cleanup
         index('role_deleted_at_idx')
             .on(table.deletedAt)
-            .where(sql`${table.deletedAt} IS NOT NULL`),
+            .where(isNotNull(table.deletedAt)),
 
         // Constraint: slug format
         check(
@@ -171,6 +171,9 @@ export const identityRoles = pgTable(
         identityId: uuid('identity_id')
             .notNull()
             .references(() => identities.id, { onDelete: 'cascade' }),
+        organizationId: uuid('organization_id')
+            .notNull()
+            .references(() => organizations.id, { onDelete: 'cascade' }),
         roleId: uuid('role_id')
             .notNull()
             .references(() => roles.id, { onDelete: 'cascade' }),
@@ -190,21 +193,31 @@ export const identityRoles = pgTable(
         // Uniqueness constraint
         uniqueIndex('identity_role_unique_idx').on(
             table.identityId,
+            table.organizationId,
             table.roleId
+        ),
+
+        // Index for identity in org (get all roles)
+        index('identity_role_identity_org_idx').on(
+            table.identityId,
+            table.organizationId
         ),
 
         // Index for reverse lookup
         index('identity_role_role_idx').on(table.roleId),
 
+        // Index for organization (list all role assignments)
+        index('identity_role_org_idx').on(table.organizationId),
+
         // Index for temporary roles (cleanup)
         index('identity_role_expires_idx')
             .on(table.expiresAt)
-            .where(sql`${table.expiresAt} IS NOT NULL`),
+            .where(isNotNull(table.expiresAt)),
 
         // Constraint: expiration must be in the future
         check(
             'identity_role_expires_future',
-            sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
+            or(isNull(table.expiresAt), gt(table.expiresAt, table.createdAt))!
         ),
     ]
 );
@@ -220,6 +233,10 @@ export const identityPermissions = pgTable(
         identityId: uuid('identity_id')
             .notNull()
             .references(() => identities.id, { onDelete: 'cascade' }),
+        organizationId: uuid('organization_id')
+            .notNull()
+            .references(() => organizations.id, { onDelete: 'cascade' }),
+
         permissionId: uuid('permission_id')
             .notNull()
             .references(() => permissions.id, { onDelete: 'cascade' }),
@@ -239,21 +256,31 @@ export const identityPermissions = pgTable(
         // Uniqueness constraint
         uniqueIndex('identity_permission_unique_idx').on(
             table.identityId,
+            table.organizationId,
             table.permissionId
+        ),
+
+        // Index for identity in org (get all permissions)
+        index('identity_permission_identity_org_idx').on(
+            table.identityId,
+            table.organizationId
         ),
 
         // Index for reverse lookup
         index('identity_permission_perm_idx').on(table.permissionId),
 
+        // Index for organization
+        index('identity_permission_org_idx').on(table.organizationId),
+
         // Index for temporary permissions
         index('identity_permission_expires_idx')
             .on(table.expiresAt)
-            .where(sql`${table.expiresAt} IS NOT NULL`),
+            .where(isNotNull(table.expiresAt)),
 
         // Constraint
         check(
             'identity_permission_expires_future',
-            sql`${table.expiresAt} IS NULL OR ${table.expiresAt} > ${table.createdAt}`
+            or(isNull(table.expiresAt), gt(table.expiresAt, table.createdAt))!
         ),
     ]
 );
@@ -285,5 +312,8 @@ export const authMethodPermissions = pgTable(
 
         // Index for authMethod (listing permissions)
         index('auth_method_permission_method_idx').on(table.authMethodId),
+
+        // Index for permission (reverse lookup)
+        index('auth_method_permission_perm_idx').on(table.permissionId),
     ]
 );

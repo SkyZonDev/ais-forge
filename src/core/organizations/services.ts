@@ -1,4 +1,3 @@
-import { identitiesRepository } from '../../db/repository/identities.repository';
 import { organizationsRepository } from '../../db/repository/organizations.repository';
 import { ApiError } from '../../utils/api/api-error';
 
@@ -18,7 +17,7 @@ export async function create(data: CreateOrganization, userId: string) {
         );
     }
 
-    const organization = await organizationsRepository.create(data);
+    const organization = await organizationsRepository.create(data, userId);
     if (!organization) {
         throw new ApiError(
             'Error during organization creation',
@@ -27,17 +26,5 @@ export async function create(data: CreateOrganization, userId: string) {
         );
     }
 
-    const identity = await identitiesRepository.updateOrganization(
-        userId,
-        organization.id
-    );
-    if (!identity) {
-        throw new ApiError(
-            'Error during organization update',
-            401,
-            'ERROR_IDENTITY_UPDATE_ORG'
-        );
-    }
-
-    return identity;
+    return organization;
 }

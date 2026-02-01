@@ -1,7 +1,7 @@
 import { relations } from 'drizzle-orm';
 import { auditLogs } from './audit';
 import { authMethods, refreshTokens, sessions } from './auth';
-import { identities } from './identities';
+import { identities, identityOrganizations } from './identities';
 import { organizations } from './organizations';
 import { rateLimits } from './rate-limits';
 import {
@@ -18,34 +18,68 @@ import {
 // ============================================================================
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
-    identities: many(identities),
+    // Multi-org membership
+    identityOrganizations: many(identityOrganizations),
+
+    // Auth
     authMethods: many(authMethods),
     sessions: many(sessions),
     refreshTokens: many(refreshTokens),
+
+    // Permissions & Roles
     permissions: many(permissions),
     roles: many(roles),
+    identityRoles: many(identityRoles),
+    identityPermissions: many(identityPermissions),
     auditLogs: many(auditLogs),
     rateLimits: many(rateLimits),
 }));
 
 export const identitiesRelations = relations(identities, ({ one, many }) => ({
-    organization: one(organizations, {
-        fields: [identities.organizationId],
-        references: [organizations.id],
-    }),
+    // Multi-org membership
+    organizationMemberships: many(identityOrganizations),
+
+    // Auth (can have multiple per org)
     authMethods: many(authMethods),
     sessions: many(sessions),
     refreshTokens: many(refreshTokens),
+
+    // Roles & Permissions (per org)
     identityRoles: many(identityRoles),
     identityPermissions: many(identityPermissions),
-    auditLogs: many(auditLogs),
-    rateLimits: many(rateLimits),
-    // Roles/permissions granted by this identity
+
+    // Traceability: Roles/permissions granted by this identity
     grantedRoles: many(identityRoles, { relationName: 'grantedBy' }),
     grantedPermissions: many(identityPermissions, {
         relationName: 'grantedBy',
     }),
+
+    // Invitations sent
+    invitedOrganizations: many(identityOrganizations, {
+        relationName: 'invitedBy',
+    }),
+    auditLogs: many(auditLogs),
+    rateLimits: many(rateLimits),
 }));
+
+export const identityOrganizationsRelations = relations(
+    identityOrganizations,
+    ({ one }) => ({
+        identity: one(identities, {
+            fields: [identityOrganizations.identityId],
+            references: [identities.id],
+        }),
+        organization: one(organizations, {
+            fields: [identityOrganizations.organizationId],
+            references: [organizations.id],
+        }),
+        invitedByIdentity: one(identities, {
+            fields: [identityOrganizations.invitedBy],
+            references: [identities.id],
+            relationName: 'invitedBy',
+        }),
+    })
+);
 
 export const authMethodsRelations = relations(authMethods, ({ one, many }) => ({
     identity: one(identities, {
@@ -136,6 +170,10 @@ export const identityRolesRelations = relations(identityRoles, ({ one }) => ({
         fields: [identityRoles.identityId],
         references: [identities.id],
     }),
+    organization: one(organizations, {
+        fields: [identityRoles.organizationId],
+        references: [organizations.id],
+    }),
     role: one(roles, {
         fields: [identityRoles.roleId],
         references: [roles.id],
@@ -153,6 +191,10 @@ export const identityPermissionsRelations = relations(
         identity: one(identities, {
             fields: [identityPermissions.identityId],
             references: [identities.id],
+        }),
+        organization: one(organizations, {
+            fields: [identityPermissions.organizationId],
+            references: [organizations.id],
         }),
         permission: one(permissions, {
             fields: [identityPermissions.permissionId],

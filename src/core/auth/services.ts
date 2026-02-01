@@ -3,6 +3,7 @@ import { config } from '../../config';
 import { auditRepository } from '../../db/repository/audit.repository';
 import { authMethodsRepository } from '../../db/repository/auth/auth-methods.repository';
 import { identitiesRepository } from '../../db/repository/identities.repository';
+import { organizationsRepository } from '../../db/repository/organizations.repository';
 import { refreshTokenRepository } from '../../db/repository/refresh-token.repository';
 import { sessionsRepository } from '../../db/repository/session.repository';
 import { ApiError } from '../../utils/api/api-error';
@@ -82,6 +83,17 @@ export async function signin(data: SigninData, ip: string) {
         );
     }
 
+    const org = await organizationsRepository.getPreferredOrganization(
+        identity.id
+    );
+    if (!org) {
+        throw new ApiError(
+            "User doesn't have organization",
+            400,
+            'USER_WITHOUT_ORG'
+        );
+    }
+
     await auditRepository.create({
         organizationId: passwordMethod.organizationId,
         identityId: identity.id,
@@ -97,7 +109,7 @@ export async function signin(data: SigninData, ip: string) {
         email: identity.email,
         name: identity.displayName,
         rememberMe: data.rememberMe,
-        organizationId: identity.organizationId,
+        organizationId: org.id,
         ipAddress: ip,
     });
 }

@@ -96,7 +96,6 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
-                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
             .where(
@@ -132,7 +131,6 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
-                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
             .where(
@@ -171,15 +169,25 @@ export const identitiesRepository = {
                 id: schema.identities.id,
                 displayName: schema.identities.displayName,
                 email: schema.identities.email,
-                organizationId: schema.identities.organizationId,
             })
             .from(schema.identities)
+            .innerJoin(
+                schema.identityOrganizations,
+                eq(
+                    schema.identityOrganizations.identityId,
+                    schema.identities.id
+                )
+            )
             .where(
                 and(
-                    eq(schema.identities.organizationId, organizationId),
+                    eq(
+                        schema.identityOrganizations.organizationId,
+                        organizationId
+                    ),
                     eq(schema.identities.email, email.toLowerCase()),
                     eq(schema.identities.status, 'active'),
-                    isNull(schema.identities.deletedAt)
+                    isNull(schema.identities.deletedAt),
+                    isNull(schema.identityOrganizations.leftAt)
                 )
             )
             .limit(1);
@@ -276,8 +284,9 @@ export const identitiesRepository = {
 
         // Build WHERE conditions
         const conditions: SQL[] = [
-            eq(schema.identities.organizationId, organizationId),
+            eq(schema.identityOrganizations.organizationId, organizationId),
             isNull(schema.identities.deletedAt),
+            isNull(schema.identityOrganizations.leftAt),
         ];
 
         if (type) {
@@ -311,8 +320,26 @@ export const identitiesRepository = {
         const queryLimit = limit + 1;
 
         let results = await db
-            .select()
+            .select({
+                id: schema.identities.id,
+                type: schema.identities.type,
+                status: schema.identities.status,
+                displayName: schema.identities.displayName,
+                email: schema.identities.email,
+                createdAt: schema.identities.createdAt,
+                updatedAt: schema.identities.updatedAt,
+                lastActivityAt: schema.identities.lastActivityAt,
+                deletedAt: schema.identities.deletedAt,
+                metadata: schema.identities.metadata,
+            })
             .from(schema.identities)
+            .innerJoin(
+                schema.identityOrganizations,
+                eq(
+                    schema.identityOrganizations.identityId,
+                    schema.identities.id
+                )
+            )
             .where(and(...conditions))
             .orderBy(
                 direction === 'forward'
@@ -341,6 +368,13 @@ export const identitiesRepository = {
             const [countResult] = await db
                 .select({ count: count() })
                 .from(schema.identities)
+                .innerJoin(
+                    schema.identityOrganizations,
+                    eq(
+                        schema.identityOrganizations.identityId,
+                        schema.identities.id
+                    )
+                )
                 .where(and(...conditions));
             totalCount = countResult?.count;
         }
@@ -375,10 +409,20 @@ export const identitiesRepository = {
         const [result] = await db
             .select({ id: schema.identities.id })
             .from(schema.identities)
+            .innerJoin(
+                schema.identityOrganizations,
+                eq(
+                    schema.identityOrganizations.identityId,
+                    schema.identities.id
+                )
+            )
             .where(
                 and(
                     eq(schema.identities.id, identityId),
-                    eq(schema.identities.organizationId, organizationId),
+                    eq(
+                        schema.identityOrganizations.organizationId,
+                        organizationId
+                    ),
                     eq(schema.identities.status, 'active'),
                     isNull(schema.identities.deletedAt)
                 )
@@ -415,7 +459,6 @@ export const identitiesRepository = {
             const [identity] = await db
                 .insert(schema.identities)
                 .values({
-                    organizationId: data.organizationId,
                     displayName: data.displayName,
                     email: data.email?.toLowerCase() ?? null,
                     type: data.type ?? 'human',
@@ -499,7 +542,6 @@ export const identitiesRepository = {
                 const [identity] = await tx
                     .insert(schema.identities)
                     .values({
-                        organizationId: organization.id,
                         displayName: data.displayName,
                         email: data.email.toLowerCase(),
                         type: 'human',
@@ -514,7 +556,23 @@ export const identitiesRepository = {
                     );
                 }
 
-                // 3. Create auth method
+                // 3. Create identity in org
+                const [member] = await tx
+                    .insert(schema.identityOrganizations)
+                    .values({
+                        identityId: identity.id,
+                        organizationId: organization.id,
+                        isPrimary: true,
+                    })
+                    .returning();
+
+                if (!member) {
+                    throw new IdentityTransactionError(
+                        'Failed to create identity member'
+                    );
+                }
+
+                // 4. Create auth method
                 const [authMethod] = await tx
                     .insert(schema.authMethods)
                     .values({
@@ -625,26 +683,6 @@ export const identitiesRepository = {
             }
             throw error;
         }
-    },
-
-    /**
-     *
-     */
-    async updateOrganization(
-        id: string,
-        organizationId: string
-    ): Promise<Identity | null> {
-        const [identity] = await db
-            .update(schema.identities)
-            .set({ organizationId })
-            .where(
-                and(
-                    eq(schema.identities.id, id),
-                    isNull(schema.identities.deletedAt)
-                )
-            )
-            .returning();
-        return identity ?? null;
     },
 
     /**
@@ -789,8 +827,9 @@ export const identitiesRepository = {
         options?: { type?: IdentityType; status?: IdentityStatus }
     ): Promise<number> {
         const conditions: SQL[] = [
-            eq(schema.identities.organizationId, organizationId),
+            eq(schema.identityOrganizations.organizationId, organizationId),
             isNull(schema.identities.deletedAt),
+            isNull(schema.identityOrganizations.leftAt),
         ];
 
         if (options?.type) {
@@ -803,6 +842,13 @@ export const identitiesRepository = {
         const [result] = await db
             .select({ count: sql<number>`count(*)::int` })
             .from(schema.identities)
+            .innerJoin(
+                schema.identityOrganizations,
+                eq(
+                    schema.identityOrganizations.identityId,
+                    schema.identities.id
+                )
+            )
             .where(and(...conditions));
 
         return result?.count ?? 0;
@@ -833,11 +879,32 @@ export const identitiesRepository = {
         limit = 10
     ): Promise<Identity[]> {
         return db
-            .select()
+            .select({
+                id: schema.identities.id,
+                displayName: schema.identities.displayName,
+                email: schema.identities.email,
+                type: schema.identities.type,
+                status: schema.identities.status,
+                createdAt: schema.identities.createdAt,
+                updatedAt: schema.identities.updatedAt,
+                lastActivityAt: schema.identities.lastActivityAt,
+                deletedAt: schema.identities.deletedAt,
+                metadata: schema.identities.metadata,
+            })
             .from(schema.identities)
+            .innerJoin(
+                schema.identityOrganizations,
+                eq(
+                    schema.identityOrganizations.identityId,
+                    schema.identities.id
+                )
+            )
             .where(
                 and(
-                    eq(schema.identities.organizationId, organizationId),
+                    eq(
+                        schema.identityOrganizations.organizationId,
+                        organizationId
+                    ),
                     eq(schema.identities.status, 'active'),
                     isNull(schema.identities.deletedAt),
                     sql`${schema.identities.lastActivityAt} >= ${since}`

@@ -52,6 +52,7 @@ export const schema = {
                     'Le slug doit contenir uniquement des lettres minuscules, chiffres et tirets'
                 )
                 .trim(),
+            metadata: z.any(),
         }),
     },
     refresh: {

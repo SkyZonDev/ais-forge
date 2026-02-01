@@ -23,6 +23,7 @@ interface SignupData {
     password: string;
     organizationName: string;
     organizationSlug: string;
+    metadata: Record<string, unknown>;
 }
 
 interface Finalize {

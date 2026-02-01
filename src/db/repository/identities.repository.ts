@@ -628,6 +628,26 @@ export const identitiesRepository = {
     },
 
     /**
+     *
+     */
+    async updateOrganization(
+        id: string,
+        organizationId: string
+    ): Promise<Identity | null> {
+        const [identity] = await db
+            .update(schema.identities)
+            .set({ organizationId })
+            .where(
+                and(
+                    eq(schema.identities.id, id),
+                    isNull(schema.identities.deletedAt)
+                )
+            )
+            .returning();
+        return identity ?? null;
+    },
+
+    /**
      * Updates the last activity date of an identity.
      *
      * This method is optimized to be called frequently

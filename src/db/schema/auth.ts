@@ -23,9 +23,10 @@ export const authMethods = pgTable(
         identityId: uuid('identity_id')
             .notNull()
             .references(() => identities.id, { onDelete: 'cascade' }),
-        organizationId: uuid('organization_id')
-            .notNull()
-            .references(() => organizations.id, { onDelete: 'cascade' }),
+        organizationId: uuid('organization_id').references(
+            () => organizations.id,
+            { onDelete: 'cascade' }
+        ),
 
         // Type and identification
         type: authMethodTypeEnum('type').notNull(),

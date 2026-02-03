@@ -323,7 +323,7 @@ export const refreshTokenRepository = {
                     eq(schema.refreshTokens.id, id),
                     isNull(schema.refreshTokens.revokedAt),
                     isNull(schema.refreshTokens.usedAt),
-                    lt(schema.refreshTokens.expiresAt, now)
+                    gt(schema.refreshTokens.expiresAt, now)
                 )
             );
 
@@ -403,7 +403,7 @@ export const refreshTokenRepository = {
                     eq(schema.refreshTokens.tokenHash, tokenHash),
                     isNull(schema.refreshTokens.revokedAt),
                     isNull(schema.refreshTokens.usedAt),
-                    lt(schema.refreshTokens.expiresAt, now)
+                    gt(schema.refreshTokens.expiresAt, now)
                 )
             );
 

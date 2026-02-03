@@ -1,0 +1,1 @@
+ALTER TABLE "auth_methods" ALTER COLUMN "organization_id" DROP NOT NULL;

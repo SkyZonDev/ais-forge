@@ -47,10 +47,11 @@ security:
         accessTokenTTL: 15m
 
     refreshToken:
-        ttlDays: 30
+        ttlDays: 2
+        rememberMeTTLDays: 15
 
     # Default signing algorithm for new keys
-    # Options: ES256, ES384, ES512, ML-DSA-65, ML-DSA-87
+    # Options: ES256, ES384, ES512
     defaultAlgorithm: ES256
 
 # ----------------------------------------------------------------------------

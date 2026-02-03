@@ -1,11 +1,11 @@
 import fastify, { type FastifyInstance } from 'fastify';
-import cron from 'node-cron';
 import { routes } from './api';
 import { config } from './config';
 import { initializeSigningKeys } from './core/keys/services';
-import { purgeExpiredToken } from './core/token/service';
+import { plugins } from './plugins';
 import { checkDatabaseHealth } from './utils/db';
 import { keyRotationScheduler } from './utils/scheduler/key-rotation';
+import { tokenCleanupScheduler } from './utils/scheduler/token-cleanup';
 
 export async function buildApp(): Promise<FastifyInstance> {
     const app = fastify({
@@ -21,6 +21,7 @@ export async function buildApp(): Promise<FastifyInstance> {
         disableRequestLogging: config.isProduction,
     });
 
+    plugins(app);
     app.register(routes);
 
     const healthDb = await checkDatabaseHealth();
@@ -39,19 +40,10 @@ export async function buildApp(): Promise<FastifyInstance> {
     keyRotationScheduler.start();
     console.log('✅ Key rotation scheduler started');
 
-    // 4. Schedule refresh token cleanup (daily at 3 AM)
-    console.log('🧹 Scheduling token cleanup...');
-    cron.schedule('0 3 * * *', async () => {
-        try {
-            const { expired, used, revoked } = await purgeExpiredToken();
-            console.log(
-                `🧹 Purged ${expired} expired, ${revoked} revoked and ${used} used refresh tokens`
-            );
-        } catch (error) {
-            console.error('❌ Token cleanup failed:', error);
-        }
-    });
-    console.log('✅ Token cleanup scheduled');
+    // 4. Start token cleanup scheduler
+    console.log('⏰ Starting token cleanup scheduler...');
+    tokenCleanupScheduler.start();
+    console.log('✅ Token cleanup scheduler started');
 
     console.log('✅ Application initialized successfully');
 

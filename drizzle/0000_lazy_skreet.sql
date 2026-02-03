@@ -29,7 +29,7 @@ CREATE TABLE "audit_logs" (
 CREATE TABLE "auth_methods" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"identity_id" uuid NOT NULL,
-	"organization_id" uuid NOT NULL,
+	"organization_id" uuid,
 	"type" "auth_method_type" NOT NULL,
 	"name" varchar(255),
 	"credential_hash" text NOT NULL,

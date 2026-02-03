@@ -17,7 +17,13 @@ async function main() {
             `  • Database: ${config.database.url.replace(/:[^:@]+@/, ':****@')}`
         );
         console.log(
+            `  • Redis: ${config.redis.url.replace(/:[^:@]+@/, ':****@')}`
+        );
+        console.log(
             `  • Key rotation: ${config.keyRotation.enabled ? 'enabled' : 'disabled'}`
+        );
+        console.log(
+            `  • Token cleanup: ${config.tokenCleanup.enabled ? 'enabled' : 'disabled'}`
         );
         console.log(
             `  • Metrics: ${config.metrics?.enabled ? 'enabled' : 'disabled'}`

@@ -33,6 +33,7 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
+        "@fastify/cookie": "^11.0.2",
         "@noble/post-quantum": "^0.5.4",
         "@node-rs/argon2": "^2.0.2",
         "dotenv": "^17.2.3",

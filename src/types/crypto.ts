@@ -96,7 +96,7 @@ export interface JWTHeader {
  */
 export interface JWTClaims {
     /** Subject (user ID) */
-    sub?: string;
+    sub: string;
     /** Issuer */
     iss?: string;
     /** Audience */

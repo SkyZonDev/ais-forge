@@ -49,7 +49,8 @@ const SecurityConfigSchema = z.object({
         accessTokenTTL: z.string().default('15m'),
     }),
     refreshToken: z.object({
-        ttlDays: z.number().int().min(1).max(365).default(30),
+        ttlDays: z.number().int().min(1).max(365).default(2),
+        rememberMeTTLDays: z.number().int().min(1).max(365).default(15),
     }),
     defaultAlgorithm: SigningAlgorithmSchema.default('ES256'),
 });
@@ -62,6 +63,22 @@ const KeyRotationConfigSchema = z.object({
     alerting: z.object({
         enabled: z.boolean().default(true),
         expirationThresholdDays: z.number().int().min(1).default(14),
+    }),
+});
+
+const TokenCleanupConfigSchema = z.object({
+    enabled: z.boolean().default(true),
+    schedule: z.string().default('0 2 * * *'),
+    thresholds: z.object({
+        revokedSessionDays: z.number().int().min(1).max(365).default(30),
+        expiredSessionDays: z.number().int().min(1).max(365).default(7),
+        revokedTokenDays: z.number().int().min(1).max(365).default(30),
+        expiredTokenDays: z.number().int().min(1).max(365).default(7),
+        usedTokenDays: z.number().int().min(1).max(365).default(90),
+    }),
+    invalidateCacheOnCleanup: z.boolean().default(true),
+    alerting: z.object({
+        enabled: z.boolean().default(true),
     }),
 });
 
@@ -135,6 +152,7 @@ const ConfigSchema = z.object({
     features: FeaturesConfigSchema,
     metrics: MetricsConfigSchema.optional(),
     isProduction: z.boolean().default(false),
+    tokenCleanup: TokenCleanupConfigSchema,
 });
 
 export type AppConfig = z.infer<typeof ConfigSchema>;
@@ -346,6 +364,10 @@ export class ConfigLoader {
                     ttlDays: env.REFRESH_TOKEN_TTL_DAYS
                         ? parseInt(env.REFRESH_TOKEN_TTL_DAYS, 10)
                         : (fileConfig.security?.refreshToken?.ttlDays ?? 30),
+                    rememberMeTTLDays: env.REFRESH_TOKEN_REMEMBER_ME_TTL_DAYS
+                        ? parseInt(env.REFRESH_TOKEN_REMEMBER_ME_TTL_DAYS, 10)
+                        : (fileConfig.security?.refreshToken
+                              ?.rememberMeTTLDays ?? 15),
                 },
                 defaultAlgorithm:
                     (env.DEFAULT_SIGNING_ALGORITHM as (typeof signingAlgorithm)[number]) ??
@@ -477,6 +499,28 @@ export class ConfigLoader {
                 env.NODE_ENV === 'production' ||
                 fileConfig.isProduction ||
                 false,
+            tokenCleanup: {
+                enabled:
+                    env.TOKEN_CLEANUP_ENABLED === 'true' ||
+                    fileConfig.tokenCleanup?.enabled ||
+                    false,
+                schedule:
+                    env.TOKEN_CLEANUP_SCHEDULE ??
+                    fileConfig.tokenCleanup?.schedule ??
+                    '0 2 * * *',
+                thresholds: fileConfig.tokenCleanup?.thresholds ?? {
+                    revokedSessionDays: 30,
+                    expiredSessionDays: 7,
+                    revokedTokenDays: 30,
+                    expiredTokenDays: 7,
+                    usedTokenDays: 90,
+                },
+                invalidateCacheOnCleanup:
+                    fileConfig.tokenCleanup?.invalidateCacheOnCleanup ?? true,
+                alerting: {
+                    enabled: fileConfig.tokenCleanup?.alerting?.enabled ?? true,
+                },
+            },
         };
     }
     /**
@@ -535,4 +579,8 @@ export function getAlertingConfig() {
 
 export function getMetricsConfig() {
     return getConfig().metrics;
+}
+
+export function getTokenCleanupConfig() {
+    return getConfig().tokenCleanup;
 }

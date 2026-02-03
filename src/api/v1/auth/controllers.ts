@@ -44,3 +44,13 @@ export async function refresh(req: FastifyRequest, res: FastifyReply) {
         return ApiResponse.handleError(res, e);
     }
 }
+
+export async function me(req: FastifyRequest, res: FastifyReply) {
+    try {
+        const userId = req.user.sub;
+        const data = await authServices.me(userId);
+        return ApiResponse.success(res, data);
+    } catch (e) {
+        return ApiResponse.handleError(res, e);
+    }
+}

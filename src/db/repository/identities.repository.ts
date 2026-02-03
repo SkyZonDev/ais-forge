@@ -577,7 +577,6 @@ export const identitiesRepository = {
                     .insert(schema.authMethods)
                     .values({
                         identityId: identity.id,
-                        organizationId: organization.id,
                         type: 'password',
                         credentialHash: data.credentialHash,
                     })
@@ -594,6 +593,7 @@ export const identitiesRepository = {
 
             return result;
         } catch (error) {
+            console.error(error);
             if (error instanceof IdentityTransactionError) {
                 throw error;
             }

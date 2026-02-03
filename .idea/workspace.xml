@@ -6,14 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="4280dc30-2284-432e-beeb-36dc2037d122" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/drizzle/meta/_journal.json" beforeDir="false" afterPath="$PROJECT_DIR$/drizzle/meta/_journal.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/core/organizations/services.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/core/organizations/services.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/repository/identities.repository.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/auth.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/auth.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/identities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/identities.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/relations.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/relations.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/db/schema/roles.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/db/schema/roles.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/types/identities.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/types/identities.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -127,12 +119,25 @@
       <workItem from="1769428463610" duration="11584000" />
       <workItem from="1769504627864" duration="8047000" />
       <workItem from="1769680227944" duration="160000" />
-      <workItem from="1769965617461" duration="8232000" />
+      <workItem from="1769965617461" duration="9230000" />
+      <workItem from="1770025118385" duration="73000" />
+      <workItem from="1770126762651" duration="2887000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

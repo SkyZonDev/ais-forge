@@ -95,7 +95,7 @@ export async function signin(data: SigninData, ip: string) {
     }
 
     await auditRepository.create({
-        organizationId: passwordMethod.organizationId,
+        organizationId: passwordMethod.organizationId ?? undefined,
         identityId: identity.id,
         authMethodId: passwordMethod.id,
         eventType: 'auth.login.success',
@@ -184,7 +184,9 @@ export async function finalize({
     const sessionTokenHash = hashToken(sessionToken);
     const refreshTokenHash = hashToken(refreshToken);
 
-    const refreshTtl = rememberMe ? 15 * 24 * 60 * 60 : 2 * 24 * 60 * 60;
+    const refreshTtl = rememberMe
+        ? config.security.refreshToken.rememberMeTTLDays * 24 * 60 * 60
+        : config.security.refreshToken.ttlDays * 24 * 60 * 60;
     const expiresAt = new Date(Date.now() + refreshTtl);
 
     const session = await sessionsRepository.create({
@@ -240,7 +242,6 @@ export async function finalize({
     return {
         access_token: accessToken,
         refresh_token: refreshToken,
-        expires_in: refreshTtl,
     };
 }
 
@@ -311,4 +312,19 @@ export async function refreshToken(plainRefreshToken: string) {
         accessToken,
         expiresIn: config.security.jwt.accessTokenTTL,
     };
+}
+
+/**
+ * Gets the current user's session information.
+ *
+ * @param userId - The user ID
+ * @returns Object with session information
+ * @throws ApiError with code 'SESSION_NOT_FOUND' if the session is not found
+ */
+export async function me(userId: string) {
+    const user = await identitiesRepository.findById(userId);
+    if (!user) {
+        throw new ApiError('User not found', 401, 'USER_NOT_FOUND');
+    }
+    return user;
 }

@@ -158,15 +158,6 @@ export async function signup(data: SignupData) {
     };
 }
 
-export async function logout(sessionId: string) {
-    await refreshTokenRepository.revokeBySessionId(sessionId, 'logout');
-    const result = await sessionsRepository.revoke(sessionId);
-    if (!result.success) {
-        throw new ApiError(result.message, 400, result.error);
-    }
-    return result.data;
-}
-
 export async function finalize({
     id,
     email,
@@ -245,6 +236,20 @@ export async function finalize({
     };
 }
 
+export async function logout(sessionId: string) {
+    await refreshTokenRepository.revokeBySessionId(sessionId, 'logout');
+    const result = await sessionsRepository.revoke(sessionId);
+    if (!result.success) {
+        throw new ApiError(result.message, 400, result.error);
+    }
+    return result.data;
+}
+
+export async function logoutAll(userId: string) {
+    await refreshTokenRepository.revokeAllByIdentityId(userId);
+    await sessionsRepository.revokeAllByIdentityId(userId);
+}
+
 /**
  * Refreshes an access token using a refresh token.
  *
@@ -312,19 +317,4 @@ export async function refreshToken(plainRefreshToken: string) {
         accessToken,
         expiresIn: config.security.jwt.accessTokenTTL,
     };
-}
-
-/**
- * Gets the current user's session information.
- *
- * @param userId - The user ID
- * @returns Object with session information
- * @throws ApiError with code 'SESSION_NOT_FOUND' if the session is not found
- */
-export async function me(userId: string) {
-    const user = await identitiesRepository.findById(userId);
-    if (!user) {
-        throw new ApiError('User not found', 401, 'USER_NOT_FOUND');
-    }
-    return user;
 }

@@ -3,10 +3,11 @@ import * as jose from 'jose';
 import { config } from '../config';
 import { getJWKS } from '../core/keys/services';
 import type { JWTClaims } from '../types/crypto';
+import { ApiResponse } from '../utils/api/api-response';
 
 declare module 'fastify' {
     interface FastifyRequest {
-        user: JWTClaims;
+        claims: JWTClaims;
     }
 }
 
@@ -31,18 +32,22 @@ const getTokenFromRequest = (req: FastifyRequest) => {
 
 export function authenticate(options?: AuthenticateOptions) {
     return async (req: FastifyRequest, res: FastifyReply) => {
-        const token = getTokenFromRequest(req);
-        if (!token) {
-            return res.status(401).send({ error: 'Unauthorized' });
+        try {
+            const token = getTokenFromRequest(req);
+            if (!token) {
+                return ApiResponse.unauthorized(res);
+            }
+
+            const jwk = await getJWKS();
+            const JWKS = jose.createLocalJWKSet(jwk);
+            const decoded = await jose.jwtVerify(token, JWKS, {
+                issuer: config.security.jwt.issuer,
+                audience: config.security.jwt.audience,
+            });
+
+            req.claims = decoded.payload as JWTClaims;
+        } catch (error) {
+            return ApiResponse.handleError(res, error);
         }
-
-        const jwk = await getJWKS();
-        const JWKS = jose.createLocalJWKSet(jwk);
-        const decoded = await jose.jwtVerify(token, JWKS, {
-            issuer: config.security.jwt.issuer,
-            audience: config.security.jwt.audience,
-        });
-
-        req.user = decoded.payload as JWTClaims;
     };
 }

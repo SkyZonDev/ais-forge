@@ -27,8 +27,18 @@ export async function signup(req: FastifyRequest, res: FastifyReply) {
 
 export async function logout(req: FastifyRequest, res: FastifyReply) {
     try {
-        const sessionId = req.headers['session-id'] as string;
+        const sessionId = req.claims.sessionId as string;
         await authServices.logout(sessionId);
+        return ApiResponse.success(res, {});
+    } catch (e) {
+        return ApiResponse.handleError(res, e);
+    }
+}
+
+export async function logoutAll(req: FastifyRequest, res: FastifyReply) {
+    try {
+        const userId = req.claims.sub;
+        await authServices.logoutAll(userId);
         return ApiResponse.success(res, {});
     } catch (e) {
         return ApiResponse.handleError(res, e);
@@ -39,16 +49,6 @@ export async function refresh(req: FastifyRequest, res: FastifyReply) {
     try {
         const { refreshToken } = schema.refresh.body.parse(req.body);
         const data = await authServices.refreshToken(refreshToken);
-        return ApiResponse.success(res, data);
-    } catch (e) {
-        return ApiResponse.handleError(res, e);
-    }
-}
-
-export async function me(req: FastifyRequest, res: FastifyReply) {
-    try {
-        const userId = req.user.sub;
-        const data = await authServices.me(userId);
         return ApiResponse.success(res, data);
     } catch (e) {
         return ApiResponse.handleError(res, e);

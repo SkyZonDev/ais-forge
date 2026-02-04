@@ -1,0 +1,142 @@
+# ============================================================================
+# AIS FORGE - MAIN CONFIGURATION
+# ============================================================================
+# This configuration can be overridden by environment variables
+# Environment variables have higher priority than this file
+
+# ----------------------------------------------------------------------------
+# Server Configuration
+# ----------------------------------------------------------------------------
+server:
+    port: 3000
+    host: 0.0.0.0
+    publicUrl: https://auth.example.com
+
+    cors:
+        enabled: true
+        origins:
+            - https://app.example.com
+            - https://dashboard.example.com
+        credentials: true
+
+    rateLimit:
+        enabled: true
+        max: 100
+        timeWindow: 1m
+
+# ----------------------------------------------------------------------------
+# Database Configuration
+# ----------------------------------------------------------------------------
+database:
+    url: postgresql://aisforge:password@postgres:5432/aisforge
+    pool:
+        min: 2
+        max: 10
+    ssl: false
+
+# ----------------------------------------------------------------------------
+# Security Configuration
+# ----------------------------------------------------------------------------
+security:
+    # CRITICAL: Override this with MASTER_ENCRYPTION_KEY env var in production
+    masterEncryptionKey: ${MASTER_ENCRYPTION_KEY}
+
+    jwt:
+        issuer: ais-forge
+        audience: api
+        accessTokenTTL: 15m
+
+    refreshToken:
+        ttlDays: 2
+        rememberMeTTLDays: 15
+
+    # Default signing algorithm for new keys
+    # Options: ES256, ES384, ES512
+    defaultAlgorithm: ES256
+
+# ----------------------------------------------------------------------------
+# Key Rotation Configuration
+# ----------------------------------------------------------------------------
+keyRotation:
+    enabled: true
+
+    # Cron schedule (daily at 2 AM)
+    schedule: "0 2 * * *"
+
+    # Rotate keys when they expire in X days
+    thresholdDays: 30
+
+    # Automatically delete expired keys
+    autoPurge: true
+
+    alerting:
+        enabled: true
+        expirationThresholdDays: 14
+
+# ----------------------------------------------------------------------------
+# Logging Configuration
+# ----------------------------------------------------------------------------
+logging:
+    # Options: trace, debug, info, warn, error, fatal
+    level: info
+
+    # Options: json, pretty
+    format: json
+
+    # Redact sensitive data (passwords, tokens, keys)
+    redactSensitive: true
+
+# ----------------------------------------------------------------------------
+# Alerting Configuration
+# ----------------------------------------------------------------------------
+alerting:
+    # Slack notifications
+    slack:
+        enabled: false
+        webhookUrl: ${SLACK_WEBHOOK_URL}
+        channel: "#ops-alerts"
+
+    # Email notifications
+    email:
+        enabled: false
+        smtp:
+            host: smtp.gmail.com
+            port: 587
+            secure: true
+            auth:
+                user: ${SMTP_USER}
+                pass: ${SMTP_PASS}
+        from: alerts@example.com
+        to:
+            - ops@example.com
+            - security@example.com
+
+    # PagerDuty integration
+    pagerduty:
+        enabled: false
+        integrationKey: ${PAGERDUTY_INTEGRATION_KEY}
+
+# ----------------------------------------------------------------------------
+# Feature Flags
+# ----------------------------------------------------------------------------
+features:
+    # Enable token introspection endpoint
+    introspection: true
+
+    # Enable OpenID configuration endpoint
+    openidConfig: true
+
+    # Enable admin API
+    adminApi: true
+
+    # Support multiple signing algorithms simultaneously
+    multiAlgorithm: false
+
+# ----------------------------------------------------------------------------
+# Metrics & Monitoring
+# ----------------------------------------------------------------------------
+metrics:
+    enabled: true
+    port: 9090
+    path: /metrics
+    prometheus: true

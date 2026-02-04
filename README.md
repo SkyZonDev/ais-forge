@@ -105,7 +105,7 @@ AIS Forge adopts proven cryptographic patterns without the overhead of interacti
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/ais-forge.git
+git clone https://github.com/SkyZonDev/ais-forge.git
 cd ais-forge
 
 # Install dependencies
@@ -180,15 +180,15 @@ AIS Forge is **not** for:
 - ❌ Consumer-facing identity providers
 - ❌ Social login or SSO platforms
 - ❌ Replacing Google/GitHub login
-- ❌ Browser-based redirect flows
+- ❌ Browser[template.md](../../Documents/WORKSTATION/DPS/dps-solution/.gitlab/merge_request_templates/template.md)-based redirect flows
 
 ---
 
 ## 🗺️ Roadmap
 
-- [ ] Core authentication API (in progress)
-- [ ] Token management and rotation
-- [ ] JWKS endpoint
+- [x] Core authentication API
+- [x] JWKS endpoint
+- [ ] Token management and rotation (in progress)
 - [ ] Multi-factor authentication support
 - [ ] API key authentication
 - [ ] Session management
@@ -227,7 +227,7 @@ AIS Forge draws inspiration from modern authentication best practices while focu
 
 - 🐛 Issues: [GitHub Issues](https://github.com/yourusername/ais-forge/issues)
 - 💬 Discussions: [GitHub Discussions](https://github.com/yourusername/ais-forge/discussions)
-- 📧 Email: security@yourproject.com
+- 📧 Email: jp.dupuis@dps-solution.com
 
 ---
 
